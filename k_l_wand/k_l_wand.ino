@@ -38,7 +38,7 @@ void loop() {
   } else if (activeTime >= 78500) { // 1:18
     stripedBlink();
   } else if (activeTime >= 73000) { // 1:13
-    fullWhite();
+    fullBlack();
   }
 }
 
