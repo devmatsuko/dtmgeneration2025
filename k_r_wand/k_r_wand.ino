@@ -2,7 +2,7 @@
 
 #define LED_PIN    3
 #define NUM_LEDS   45
-#define BRIGHTNESS 200
+#define BRIGHTNESS 100
 
 Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRBW + NEO_KHZ800);
 
