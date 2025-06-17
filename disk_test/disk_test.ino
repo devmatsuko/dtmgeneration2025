@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #define LED_PIN    3        // データ出力ピン
-#define NUM_LEDS   24       // LED数（リングに応じて変更）
+#define NUM_LEDS   40       // LED数（リングに応じて変更）
 #define BRIGHTNESS 100      // 明るさ（0〜255）
 
 Adafruit_NeoPixel ring(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
