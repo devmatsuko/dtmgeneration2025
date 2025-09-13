@@ -9,6 +9,10 @@ Adafruit_NeoPixel ring(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 unsigned long lastUpdate = 0;
 int currentIndex = 0;
 bool animationFinished = false;
+#define LED_on_wait  68500
+#define LED_disk_speed  50
+#define LED_off_wait  4000
+int test = 2;//1:本モード,2:開発モード
 
 void setup() {
   ring.begin();
@@ -17,15 +21,24 @@ void setup() {
 }
 
 void loop() {
-  // アニメーションが終わっていないなら実行
-  if (!animationFinished && millis() - lastUpdate >= 200) {
-    ring.setPixelColor(currentIndex, ring.Color(255, 255, 255)); // 白に点灯
-    ring.show();
-    currentIndex++;
-    lastUpdate = millis();
+  delay(LED_on_wait);
+  LEDdisk_on(NUM_LEDS,LED_disk_speed);
+  delay(LED_off_wait);
+  setAllColor(ring.Color(0, 0, 0));
+  delay(10000000);
+}
 
-    if (currentIndex >= NUM_LEDS) {
-      animationFinished = true;
-    }
+void setAllColor(uint32_t color) {
+  for (uint16_t i = 0; i <NUM_LEDS; i++) {
+    ring.setPixelColor(i, color);
+  }
+  ring.show();
+}
+
+void LEDdisk_on(uint32_t num,uint32_t speed){
+  for(uint16_t i=0; i<=num; i++) {
+    ring.setPixelColor(i, ring.Color(255, 255, 255)); // 白に点灯
+    ring.show();
+    delay(speed);
   }
 }
