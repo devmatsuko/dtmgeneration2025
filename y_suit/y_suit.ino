@@ -1,21 +1,94 @@
+/**
+ * Yukichi LED Controller
+ *
+ * 接続:
+ * - 左腕: Pin 3 (36個)
+ * - 左胴: Pin 4 (27個)  
+ * - 右胴: Pin 6 (27個)
+ * - 右腕: Pin 7 (36個)
+ * - 右足: Pin 8 (21個)
+ * - 左足: Pin 9 (21個)
+ */
+
 #include <Adafruit_NeoPixel.h>
 
+// ==================== 設定値 ====================
+// LED設定
 #define BRIGHTNESS 100
-#define armLeft_LED 36
-#define bodyLeft_LED 27
-#define bodyRight_LED 27
-#define armRight_LED 36
-#define legRight_LED 21
-#define legLeft_LED 21
 
-Adafruit_NeoPixel armLeft(armLeft_LED, 3, NEO_GRBW + NEO_KHZ800);  // 左腕 LED個数 36
-Adafruit_NeoPixel bodyLeft(bodyLeft_LED, 4, NEO_GRBW + NEO_KHZ800); // 左胴 LED個数 27
-Adafruit_NeoPixel bodyRight(bodyRight_LED, 6, NEO_GRBW + NEO_KHZ800);// 右胴 LED個数 27
-Adafruit_NeoPixel armRight(armRight_LED, 7, NEO_GRBW + NEO_KHZ800); // 右腕 LED個数 36
-Adafruit_NeoPixel legRight(legRight_LED, 8, NEO_GRBW + NEO_KHZ800); // 右足 LED個数 21
-Adafruit_NeoPixel legLeft(legLeft_LED, 9, NEO_GRBW + NEO_KHZ800);  // 左足 LED個数 21
+// LED個数
+#define ARM_LEFT_LED   36
+#define BODY_LEFT_LED  27
+#define BODY_RIGHT_LED 27
+#define ARM_RIGHT_LED  36
+#define LEG_RIGHT_LED  21
+#define LEG_LEFT_LED   21
 
-byte neopix_gamma[] = {
+// ピン番号
+#define PIN_ARM_LEFT   3
+#define PIN_BODY_LEFT  4
+#define PIN_BODY_RIGHT 6
+#define PIN_ARM_RIGHT  7
+#define PIN_LEG_RIGHT  8
+#define PIN_LEG_LEFT   9
+
+// モード設定 (1:本番モード 2:開発モード)
+#define MODE 1
+
+// ==================== タイミング設定 ====================
+// じわじわ光る（消える）
+#define PULSE_WHITE_WAIT      5500  // 開始待ち時間
+#define PULSE_WHITE_WAIT2     1500  // 部位間待ち時間
+#define PULSE_WHITE_TIME      1     // 点滅回数
+#define PULSE_WHITE_SPACE     5     // 点滅間隔
+#define PULSE_WHITE_SPEED     1     // 点灯速度
+
+// ランダム点灯
+#define RANDOM_ALL_WAIT       1000  // 1回目の待ち時間
+#define RANDOM_ALL_WAIT2      14000 // 2回目の待ち時間  
+#define RANDOM_ALL_TIME       25    // 点灯回数
+#define RANDOM_ALL_SPACE      50    // 点灯間隔
+#define RANDOM_ALL_NUM        5     // 同時点灯個数
+
+// 下から上への点灯
+#define WAVE_FOOT_WAIT        500   // 開始待ち時間
+#define WAVE_TIME             10    // 点灯間隔
+
+// 衣装切り替え
+#define SUITS_CHANGE_WAIT     8000  // 開始待ち時間
+#define SUITS_CHANGE_TIME     2     // 切替回数
+#define SUITS_CHANGE_SPACE    2000  // 切替間隔
+
+// じわじわ光る（消えない）
+#define PULSE_HOLD_WAIT       0     // 開始待ち時間
+#define PULSE_HOLD_WAIT2      1000  // 部位間待ち時間
+#define PULSE_HOLD_TIME       1     // 点滅回数
+#define PULSE_HOLD_SPACE      5     // 点滅間隔
+#define PULSE_HOLD_SPEED      3     // 点灯速度
+
+// 中央への集光
+#define LED_CENTER_WAIT       1500  // 開始待ち時間
+#define LED_CENTER_SPEED      20    // 点灯速度
+#define LED_CENTER_NUM_MOVE   5     // 移動個数
+#define LED_CENTER_TIME       3     // 繰り返し回数
+#define LED_CENTER_OFFSET     2     // 位置調整
+
+// シアターチェイス
+#define THEATER_CHASE_WAIT    4500  // 開始待ち時間
+#define THEATER_CHASE_SPEED   20    // 点灯速度
+#define THEATER_CHASE_TIME    60    // 繰り返し回数
+
+// ==================== グローバル変数 ====================
+// LEDストリップオブジェクト
+Adafruit_NeoPixel armLeft(ARM_LEFT_LED, PIN_ARM_LEFT, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel bodyLeft(BODY_LEFT_LED, PIN_BODY_LEFT, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel bodyRight(BODY_RIGHT_LED, PIN_BODY_RIGHT, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel armRight(ARM_RIGHT_LED, PIN_ARM_RIGHT, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel legRight(LEG_RIGHT_LED, PIN_LEG_RIGHT, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel legLeft(LEG_LEFT_LED, PIN_LEG_LEFT, NEO_GRBW + NEO_KHZ800);
+
+// ガンマ補正テーブル
+const byte neopix_gamma[] PROGMEM = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
     1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
@@ -31,682 +104,452 @@ byte neopix_gamma[] = {
   115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
   144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
   177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
-  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
+  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255
+};
 
+// ==================== 初期設定 ====================
 void setup() {
-  armLeft.begin();     armLeft.setBrightness(BRIGHTNESS);     armLeft.show();
-  bodyLeft.begin();    bodyLeft.setBrightness(BRIGHTNESS);    bodyLeft.show();
-  bodyRight.begin();   bodyRight.setBrightness(BRIGHTNESS);   bodyRight.show();
-  armRight.begin();    armRight.setBrightness(BRIGHTNESS);    armRight.show();
-  legRight.begin();    legRight.setBrightness(BRIGHTNESS);    legRight.show();
-  legLeft.begin();     legLeft.setBrightness(BRIGHTNESS);     legLeft.show();
+  initializeLED(&armLeft);
+  initializeLED(&bodyLeft);
+  initializeLED(&bodyRight);
+  initializeLED(&armRight);
+  initializeLED(&legRight);
+  initializeLED(&legLeft);
 }
 
-//じわじわ光る 脛⇒もも⇒腰⇒アーム　消える
-#define pulseWhite_wait 1000//じわじわの光までの時間
-#define pulseWhite_wait2 1000 //じわじわ光　脛⇒モモ⇒腰⇒腕の待ち時間
-#define pulseWhite_time 1 //じわじわ光回数
-#define pulseWhite_space 5 //じわじわ光間隔
-#define pulseWhite_speed 1 //じわじわ光点灯速度
+void initializeLED(Adafruit_NeoPixel* strip) {
+  strip->begin();
+  strip->setBrightness(BRIGHTNESS);
+  strip->show();
+}
 
-//じわじわ光る 脛⇒もも⇒腰⇒アーム　消えない
-#define pulseWhite_hold_wait 1000//じわじわの光までの時間
-#define pulseWhite_hold_wait2 1000 //じわじわ光　脛⇒モモ⇒腰⇒腕の待ち時間
-#define pulseWhite_hold_time 1 //じわじわ光回数
-#define pulseWhite_hold_space 5 //じわじわ光間隔
-#define pulseWhite_hold_speed 3 //じわじわ光点灯速度
-
-#define colorWipeRange_wave_foot_wait 1000//下⇒上点灯までの時間
-#define colorWipeRange_wave_time 10//下⇒上点灯の点灯間隔時間
-
-#define random_all_wait 1000//ランダム点灯までの時間
-#define random_all_wait2 10000//ランダム点灯までの時間
-#define random_all_time 25//ランダム点灯までの回数
-#define random_all_space 50//ランダム点灯までの間隔
-#define random_all_num 5//ランダム点灯までの間隔
-
-#define suits_led_change_wait 7000//諭吉衣装　小松衣装に入れ替わりの待ち時間
-#define suits_led_change_time 5//諭吉衣装　小松衣装に入れ替わりの回数
-#define suits_led_change_space 1000//諭吉衣装　小松衣装に入れ替わりの感覚
-
-#define pulseWhite_series_hold 3000//じわじわ光⇒全身
-
-////LEDディスクに光が集まっていく
-#define LEDtoCenter_up_speed 20 //点灯スピード
-#define LEDtoCenter_up_num_move 5//移動個数( 移動個数＝(総数/2)ー変数値)
-#define LEDtoCenter_up_time 5//点灯回数
-
- 
-
-#define moni 2//じわじわ光⇒全身
+// ==================== メインループ ====================
 void loop() {
-  // 1. 全身に単色
-if(moni == 1){
-  delay(pulseWhite_wait);
-//////////////////じわじわ光る 脛⇒もも⇒腰⇒アーム
- pulseWhite_series_sune(pulseWhite_time, pulseWhite_space, pulseWhite_speed); //(time,wait,speed)
-  delay(pulseWhite_wait2);
- pulseWhite_series_momo(pulseWhite_time, pulseWhite_space, pulseWhite_speed); //(time,wait,speed)
-   delay(pulseWhite_wait2);
- pulseWhite_series_body(pulseWhite_time, pulseWhite_space, pulseWhite_speed); //(time,wait,speed)
-   delay(pulseWhite_wait2);
- pulseWhite_arm(pulseWhite_time, pulseWhite_space, pulseWhite_speed); //(time,wait,speed)
-   delay(pulseWhite_wait2);
-///////////////////////////////
-   delay(random_all_wait);
-//////////////////ランダム点灯
-  random_all(armLeft.Color(0, 0, 0, 255),random_all_time, random_all_space,random_all_num); //左アーム　ランダム点灯 ,関数(色、点灯回数、待ち時間、点灯個数)
-//////////////////////////////
-   delay(colorWipeRange_wave_foot_wait);
-//////////////////下⇒上の点灯
-colorWipeRange_wave_foot(armLeft.Color(0, 0, 0, 255), colorWipeRange_wave_time); // 白  
-colorWipeRange_wave_bodyarm(armLeft.Color(0, 0, 0, 255), colorWipeRange_wave_time); // 白
-//////////////////////////////
-  delay(random_all_wait2);
-//////////////////ランダム点灯
-  setAllColor(armLeft.Color(0, 0, 0, 0)); // 白
-  random_all(armLeft.Color(0, 0, 0, 255),random_all_time, random_all_space,random_all_num); //左アーム　ランダム点灯 ,関数(色、点灯回数、間隔、点灯個数)
-   setAllColor(armLeft.Color(0, 0, 0, 0)); // off
-//////////////////////////////
-  delay(suits_led_change_wait);
-/////////////////諭吉衣装と小松衣装の光の移動
-suits_led_change(armLeft.Color(0, 0, 0, 255),armLeft.Color(0, 0, 0, 0),suits_led_change_time,suits_led_change_space);//関数(点灯する色、消灯、点灯回数、点灯間隔)
-//////////////////////////////////////////////
- delay(pulseWhite_series_hold);
-//////////////////じわじわ光る 消えない
- pulseWhite_series_sune_hold(pulseWhite_hold_time, pulseWhite_hold_space, pulseWhite_hold_speed); //(time,wait,speed)
-  delay(pulseWhite_wait2);
- pulseWhite_series_momo_hold(pulseWhite_hold_time, pulseWhite_hold_space, pulseWhite_hold_speed); //(time,wait,speed)
-   delay(pulseWhite_wait2);
- pulseWhite_series_body_hold(pulseWhite_hold_time, pulseWhite_hold_space, pulseWhite_hold_speed); //(time,wait,speed)
-   delay(pulseWhite_wait2);
- pulseWhite_arm_hold(pulseWhite_hold_time, pulseWhite_hold_space, pulseWhite_hold_speed); //(time,wait,speed)
-   delay(pulseWhite_wait2);
-///////////////////////////////
-
-  ///////////////////////////////中央に光が集まっていく
- setAllColor(armLeft.Color(0, 0, 0, 0)); // 白
- LEDtoCenter(armLeft.Color(0, 0, 0, 255), LEDtoCenter_up_speed,armLeft_LED,LEDtoCenter_up_num_move,LEDtoCenter_up_time);//(色、スピード、LED個数、LED幅(総数- 変数、間隔)、回数
- ///////////////////////////////
-
-  
-//setAllColor(armLeft.Color(0, 0, 0, 255)); // 白
-//
-//
-//  delay(1000);
-//  setAllColor(armLeft.Color(255, 0, 0, 0)); // 赤
-//  delay(1000);
-//  setAllColor(armLeft.Color(0, 255, 0, 0)); // 緑
-//  delay(1000);
-//  setAllColor(armLeft.Color(0, 0, 255, 0)); // 青
-//  delay(1000);
-//  setAllColor(armLeft.Color(0, 0, 0, 255)); // 白
-//  delay(1000);
-//  setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯 
-//  delay(1000);
-  // 3. rainbow
-  rainbowCycleAll(10);
-  delay(10000000);
+  if (MODE == 1) {
+    performMainSequence();
+  } else if (MODE == 2) {
+    performDebugSequence();
+  }
 }
-if(moni == 2){
-  ///////////////////////////////中央に光が集まっていく
- setAllColor(armLeft.Color(0, 0, 0, 0)); // 白
- LEDtoCenter(armLeft.Color(0, 0, 0, 255), LEDtoCenter_up_speed,armLeft_LED,LEDtoCenter_up_num_move,LEDtoCenter_up_time);//(色、スピード、LED個数、LED幅(総数- 変数、間隔)、回数
- ///////////////////////////////
+
+// ==================== シーケンス制御 ====================
+void performMainSequence() {
+  // 1. じわじわ光る（脛→もも→腰→アーム）消える
+  delay(PULSE_WHITE_WAIT);
+  pulseWhite_series_sune(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+  delay(PULSE_WHITE_WAIT2);
+  pulseWhite_series_momo(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+  delay(PULSE_WHITE_WAIT2);
+  pulseWhite_series_body(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+  delay(PULSE_WHITE_WAIT2);
+  pulseWhite_arm(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+
+  // 2. ランダム点灯（1回目）
+  delay(RANDOM_ALL_WAIT);
+  random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+
+  // 3. 下から上への点灯
+  delay(WAVE_FOOT_WAIT);
+  colorWipeRange_wave_foot(getWhiteColor(), WAVE_TIME);
+  colorWipeRange_wave_bodyarm(getWhiteColor(), WAVE_TIME);
+
+  // 4. ランダム点灯（2回目）
+  delay(RANDOM_ALL_WAIT2);
+  setAllColor(0);
+  random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+  setAllColor(0);
+
+  // 5. 衣装切り替え
+  delay(SUITS_CHANGE_WAIT);
+  suits_led_change(getWhiteColor(), 0, SUITS_CHANGE_TIME, SUITS_CHANGE_SPACE);
+
+  // 6. じわじわ光る（脛→もも→腰→アーム）消えない
+  delay(PULSE_HOLD_WAIT);
+  pulseWhite_series_sune_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+  delay(PULSE_HOLD_WAIT2);
+  pulseWhite_series_momo_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+  delay(PULSE_HOLD_WAIT2);
+  pulseWhite_series_body_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+  delay(PULSE_HOLD_WAIT2);
+  pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+
+  // 7. 中央への集光
+  delay(LED_CENTER_WAIT);
+  setAllColor(0);
+  LEDtoCenter(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
+              LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
+  setAllColor(0);
+
+  // 8. パチ屋
+  delay(THEATER_CHASE_WAIT);
+  theaterChase(getWhiteColor(), THEATER_CHASE_SPEED, THEATER_CHASE_TIME);
+
   delay(10000000);
 }
 
+void performDebugSequence() {
+  setAllColor(0);
+  LEDtoCenter(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
+              LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
+  setAllColor(0);
+  theaterChase(getWhiteColor(), THEATER_CHASE_SPEED, THEATER_CHASE_TIME);
+  delay(10000000);
 }
 
+// ==================== 色設定関数 ====================
+uint32_t getWhiteColor() {
+  return armLeft.Color(0, 0, 0, 255);
+}
 
 void setAllColor(uint32_t color) {
-  Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
-  for (auto strip : strips) {
-    for (uint16_t i = 0; i < strip->numPixels(); i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+  setStripColor(&armLeft, color, 0, armLeft.numPixels());
+  setStripColor(&bodyLeft, color, 0, bodyLeft.numPixels());
+  setStripColor(&bodyRight, color, 0, bodyRight.numPixels());
+  setStripColor(&armRight, color, 0, armRight.numPixels());
+  setStripColor(&legRight, color, 0, legRight.numPixels());
+  setStripColor(&legLeft, color, 0, legLeft.numPixels());
 }
 
-void setarmLeftColor(uint32_t color) {//アーム左
-  Adafruit_NeoPixel* strips[] = { &armLeft };
-  for (auto strip : strips) {
-    for (uint16_t i = 0; i < strip->numPixels(); i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
+void setStripColor(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
+  for (uint16_t i = start; i < end; i++) {
+    strip->setPixelColor(i, color);
   }
+  strip->show();
 }
 
-void setbodyLeftColor(uint32_t color) {//ボディー左
-  Adafruit_NeoPixel* strips[] = { &bodyLeft };
-  for (auto strip : strips) {
-    for (uint16_t i = 0; i < strip->numPixels(); i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+void setarmLeftColor(uint32_t color) {
+  setStripColor(&armLeft, color, 0, armLeft.numPixels());
 }
 
-void setbodyRightColor(uint32_t color) {//ボディー右
-  Adafruit_NeoPixel* strips[] = { &bodyRight };
-  for (auto strip : strips) {
-    for (uint16_t i = 0; i < strip->numPixels(); i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+void setarmRightColor(uint32_t color) {
+  setStripColor(&armRight, color, 0, armRight.numPixels());
 }
 
-void setarmRightColor(uint32_t color) {//アーム　右
-  Adafruit_NeoPixel* strips[] = { &armRight };
-  for (auto strip : strips) {
-    for (uint16_t i = 0; i < strip->numPixels(); i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+void setbodyLeftColor(uint32_t color) {
+  setStripColor(&bodyLeft, color, 0, bodyLeft.numPixels());
 }
 
-void setlegRightColor(uint32_t color) {//モモ　右
-  Adafruit_NeoPixel* strips[] = { &legRight };
-  for (auto strip : strips) {
-    for (uint16_t i = 0; i < strip->numPixels()-10; i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+void setbodyRightColor(uint32_t color) {
+  setStripColor(&bodyRight, color, 0, bodyRight.numPixels());
 }
 
-void setlegLeftColor(uint32_t color) {//モモ　左
-  Adafruit_NeoPixel* strips[] = { &legLeft };
-  for (auto strip : strips) {
-    for (uint16_t i = 0; i < strip->numPixels()-10; i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+void setlegRightColor(uint32_t color) {
+  setStripColor(&legRight, color, 0, legRight.numPixels() - 10);
 }
 
-void setlegRightColor_sune(uint32_t color) { //脛　左
-  Adafruit_NeoPixel* strips[] = { &legRight };
-  for (auto strip : strips) {
-    for (uint16_t i = 11; i < strip->numPixels(); i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+void setlegLeftColor(uint32_t color) {
+  setStripColor(&legLeft, color, 0, legLeft.numPixels() - 10);
 }
 
-void setlegLeftColor_sune(uint32_t color) {  // 脛　右
-  Adafruit_NeoPixel* strips[] = { &legLeft };
-  for (auto strip : strips) {
-    for (uint16_t i = 11; i < strip->numPixels(); i++) {
-      strip->setPixelColor(i, color);
-    }
-    strip->show();
-  }
+void setlegRightColor_sune(uint32_t color) {
+  setStripColor(&legRight, color, 11, legRight.numPixels());
 }
 
-void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
+void setlegLeftColor_sune(uint32_t color) {
+  setStripColor(&legLeft, color, 11, legLeft.numPixels());
+}
+
+// ==================== パルス効果 ====================
+void pulseEffect(void (*setColorFunc1)(uint32_t), void (*setColorFunc2)(uint32_t), 
+                 uint16_t time, uint8_t wait, uint8_t speed, bool fadeOut) {
   for (uint16_t k = 0; k < time; k++) {
+    // フェードイン
     for (int j = 0; j < 256; j += speed) {
-      uint8_t val = neopix_gamma[j];
-      setAllColor(armLeft.Color(0, 0, 0, val));
+      uint8_t val = pgm_read_byte(&neopix_gamma[j]);
+      uint32_t color = armLeft.Color(0, 0, 0, val);
+      setColorFunc1(color);
+      if (setColorFunc2 != NULL) setColorFunc2(color);
       delay(wait);
     }
-    for (int j = 255; j >= 0; j -= 4) {
-      uint8_t val = neopix_gamma[j];
-      setAllColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-    delay(100);
-  }
-}
-
-//脛（すね）光る
-void pulseWhite_series_sune(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-      setlegRightColor_sune(armLeft.Color(0, 0, 0, val));
-      setlegLeftColor_sune(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-    for (int j = 255; j >= 0; j -= 4) {
-      uint8_t val = neopix_gamma[j];
-      setlegRightColor_sune(armLeft.Color(0, 0, 0, val));
-      setlegLeftColor_sune(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-  
-    delay(100);
-  }
-}
-
-//太もも光る
-void pulseWhite_series_momo(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-      setlegRightColor(armLeft.Color(0, 0, 0, val));
-      setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-    for (int j = 255; j >= 0; j -= 4) {
-      uint8_t val = neopix_gamma[j];
-      setlegRightColor(armLeft.Color(0, 0, 0, val));
-      setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-  
-    delay(100);
-  }
-}
-
-//腰　光る
-void pulseWhite_series_body(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-      setbodyLeftColor(armLeft.Color(0, 0, 0, val));
-      setbodyRightColor(armLeft.Color(0, 0, 0, val));
-     // setlegRightColor(armLeft.Color(0, 0, 0, val));
-     // setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-    for (int j = 255; j >= 0; j -= 4) {
-      uint8_t val = neopix_gamma[j];
-      setbodyLeftColor(armLeft.Color(0, 0, 0, val));
-      setbodyRightColor(armLeft.Color(0, 0, 0, val));
-    //  setlegRightColor(armLeft.Color(0, 0, 0, val));
-    //  setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-  
-    delay(100);
-  }
-}
-
-//アーム　光る
-void  pulseWhite_arm(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-     setarmRightColor(armLeft.Color(0, 0, 0, val));
-     setarmLeftColor(armLeft.Color(0, 0, 0, val));
-     // setlegRightColor(armLeft.Color(0, 0, 0, val));
-     // setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-    for (int j = 255; j >= 0; j -= 4) {
-      uint8_t val = neopix_gamma[j];
-     setarmRightColor(armLeft.Color(0, 0, 0, val));
-     setarmLeftColor(armLeft.Color(0, 0, 0, val));
-    //  setlegRightColor(armLeft.Color(0, 0, 0, val));
-    //  setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-  
-    delay(100);
-  }
-}
-
-void rainbowCycleAll(uint8_t wait) {
-  uint16_t maxPixels = 0;
-  Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
-  for (auto strip : strips) {
-    if (strip->numPixels() > maxPixels) maxPixels = strip->numPixels();
-  }
-
-  for (uint16_t j = 0; j < 256 * 5; j++) {
-    for (auto strip : strips) {
-      for (uint16_t i = 0; i < strip->numPixels(); i++) {
-        strip->setPixelColor(i, Wheel(((i * 256 / maxPixels) + j) & 255));
+    // フェードアウト
+    if (fadeOut) {
+      for (int j = 255; j >= 0; j -= 4) {
+        uint8_t val = pgm_read_byte(&neopix_gamma[j]);
+        uint32_t color = armLeft.Color(0, 0, 0, val);
+        setColorFunc1(color);
+        if (setColorFunc2 != NULL) setColorFunc2(color);
+        delay(wait);
       }
-      strip->show();
     }
+    delay(100);
+  }
+}
+
+// 脛（すね）光る
+void pulseWhite_series_sune(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor_sune, setlegLeftColor_sune, time, wait, speed, true);
+}
+
+// 太もも光る
+void pulseWhite_series_momo(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor, setlegLeftColor, time, wait, speed, true);
+}
+
+// 腰光る
+void pulseWhite_series_body(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, true);
+}
+
+// アーム光る
+void pulseWhite_arm(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setarmRightColor, setarmLeftColor, time, wait, speed, true);
+}
+
+// 脛光る（ホールド）
+void pulseWhite_series_sune_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor_sune, setlegLeftColor_sune, time, wait, speed, false);
+}
+
+// 太もも光る（ホールド）
+void pulseWhite_series_momo_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor, setlegLeftColor, time, wait, speed, false);
+}
+
+// 腰光る（ホールド）
+void pulseWhite_series_body_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, false);
+}
+
+// アーム光る（ホールド）
+void pulseWhite_arm_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setarmRightColor, setarmLeftColor, time, wait, speed, false);
+}
+
+// ==================== ランダム点灯 ====================
+void random_all(uint32_t c, uint16_t time, uint8_t wait, uint8_t num) {
+  for (uint16_t t = 0; t <= time; t++) {
+    // ランダム位置を生成して点灯
+    uint32_t positions[6];
+    positions[0] = random(0, ARM_LEFT_LED);
+    positions[1] = random(0, BODY_LEFT_LED);
+    positions[2] = random(0, BODY_RIGHT_LED);
+    positions[3] = random(0, ARM_RIGHT_LED);
+    positions[4] = random(0, LEG_RIGHT_LED);
+    positions[5] = random(0, LEG_LEFT_LED);
+    
+    // 点灯
+    setRandomPixels(&armLeft, positions[0], num, c);
+    setRandomPixels(&bodyLeft, positions[1], num, c);
+    setRandomPixels(&bodyRight, positions[2], num, c);
+    setRandomPixels(&armRight, positions[3], num, c);
+    setRandomPixels(&legRight, positions[4], num, c);
+    setRandomPixels(&legLeft, positions[5], num, c);
+    
+    delay(wait);
+    
+    // 消灯
+    setRandomPixels(&armLeft, positions[0], num, 0);
+    setRandomPixels(&bodyLeft, positions[1], num, 0);
+    setRandomPixels(&bodyRight, positions[2], num, 0);
+    setRandomPixels(&armRight, positions[3], num, 0);
+    setRandomPixels(&legRight, positions[4], num, 0);
+    setRandomPixels(&legLeft, positions[5], num, 0);
+  }
+}
+
+void setRandomPixels(Adafruit_NeoPixel* strip, uint32_t pos, uint8_t num, uint32_t color) {
+  uint16_t maxPos = strip->numPixels();
+  for (uint16_t i = pos; i < pos + num && i < maxPos; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
+}
+
+// ==================== ウェーブ効果 ====================
+void colorWipeRange_wave_foot(uint32_t c, uint32_t wait) {
+  for (uint16_t i = LEG_RIGHT_LED; i > 0; i--) {
+    legRight.setPixelColor(i, c);
+    legLeft.setPixelColor(i, c);
+    legRight.show();
+    legLeft.show();
     delay(wait);
   }
 }
 
+void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
+  uint32_t g = ARM_LEFT_LED / 2;
+  
+  for (uint16_t i = ARM_LEFT_LED; i > 0; i--) {
+    // ボディー部分
+    bodyLeft.setPixelColor(i, c);
+    bodyRight.setPixelColor(i, c);
+    bodyLeft.show();
+    bodyRight.show();
+    delay(wait);
+    
+    // アーム部分
+    if (i >= ARM_LEFT_LED / 2) {
+      uint16_t armPos = i - (ARM_LEFT_LED / 2 + 1);
+      armLeft.setPixelColor(armPos, c);
+      armRight.setPixelColor(armPos, c);
+      armLeft.setPixelColor(g, c);
+      armRight.setPixelColor(g, c);
+      armLeft.show();
+      armRight.show();
+      g++;
+      delay(wait);
+    }
+  }
+}
 
+// ==================== 衣装切り替え ====================
+void suits_led_change(uint32_t colorOn, uint32_t colorOff, uint32_t time, uint32_t wait) {
+  for (uint16_t k = 0; k < time; k++) {
+    setAllColor(colorOn);
+    delay(wait);
+    setAllColor(colorOff);
+    delay(wait);
+  }
+}
+
+// ==================== 中央への集光 ====================
+void LEDtoCenter(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove, 
+                 uint8_t time, uint8_t offset) {
+  for (uint16_t t = 0; t < time; t++) {
+    uint8_t i = 0;
+    uint8_t g = 0;
+    uint8_t u = LEG_RIGHT_LED;
+    
+    for (uint16_t k = num; k > 0; k--) {
+      // ボディー上から下
+      if (i < (BODY_LEFT_LED / 2) - numMove - offset) {
+        bodyLeft.setPixelColor(i, c);
+        bodyRight.setPixelColor(i, c);
+        bodyLeft.show();
+        bodyRight.show();
+        i++;
+      }
+      
+      // ボディー下から上
+      if (k >= (BODY_LEFT_LED / 2) - numMove - offset) {
+        bodyLeft.setPixelColor(k, c);
+        bodyRight.setPixelColor(k, c);
+        bodyLeft.show();
+        bodyRight.show();
+      }
+      
+      // アーム下から上
+      if (k >= ARM_LEFT_LED / 2) {
+        uint16_t armPos = k - (ARM_LEFT_LED + 2) / 2;
+        armLeft.setPixelColor(armPos, c);
+        armRight.setPixelColor(armPos, c);
+        armLeft.show();
+        armRight.show();
+      }
+      
+      // 足下から上
+      if (u <= k) {
+        legRight.setPixelColor(u, c);
+        legLeft.setPixelColor(u, c);
+        legRight.show();
+        legLeft.show();
+        u--;
+      }
+      
+      // 前のLEDを消灯
+      clearPreviousLEDs(k, g, numMove);
+      delay(wait);
+      g++;
+    }
+  }
+}
+
+void clearPreviousLEDs(uint16_t k, uint8_t g, uint8_t numMove) {
+  bodyLeft.setPixelColor(g - numMove, 0);
+  bodyRight.setPixelColor(g - numMove, 0);
+  bodyLeft.setPixelColor(k + numMove, 0);
+  bodyRight.setPixelColor(k + numMove, 0);
+  armLeft.setPixelColor(k - numMove - (19 - numMove * 2), 0);
+  armRight.setPixelColor(k - numMove - (19 - numMove * 2), 0);
+  legRight.setPixelColor(k - numMove - (15 - numMove * 2), 0);
+  legLeft.setPixelColor(k - numMove - (15 - numMove * 2), 0);
+  
+  armLeft.show();
+  bodyLeft.show();
+  bodyRight.show();
+  armRight.show();
+  legRight.show();
+  legLeft.show();
+}
+
+// ==================== シアターチェイス ====================
+void theaterChase(uint32_t c, uint8_t wait, uint8_t cycle) {
+  for (int j = 0; j < cycle; j++) {
+    for (int q = 0; q < 3; q++) {
+      // 3つおきにLEDを点灯
+      for (uint16_t i = 0; i < ARM_RIGHT_LED; i = i + 3) {
+        setTheaterPixel(&armLeft, i + q, c);
+        setTheaterPixel(&bodyLeft, i + q, c);
+        setTheaterPixel(&bodyRight, i + q, c);
+        setTheaterPixel(&armRight, i + q, c);
+        setTheaterPixel(&legRight, i + q, c);
+        setTheaterPixel(&legLeft, i + q, c);
+      }
+      showAllStrips();
+      delay(wait);
+      
+      // 消灯
+      for (uint16_t i = 0; i < ARM_RIGHT_LED; i = i + 3) {
+        setTheaterPixel(&armLeft, i + q, 0);
+        setTheaterPixel(&bodyLeft, i + q, 0);
+        setTheaterPixel(&bodyRight, i + q, 0);
+        setTheaterPixel(&armRight, i + q, 0);
+        setTheaterPixel(&legRight, i + q, 0);
+        setTheaterPixel(&legLeft, i + q, 0);
+      }
+      showAllStrips();
+    }
+  }
+}
+
+void setTheaterPixel(Adafruit_NeoPixel* strip, uint16_t pos, uint32_t color) {
+  if (pos < strip->numPixels()) {
+    strip->setPixelColor(pos, color);
+  }
+}
+
+// ==================== ユーティリティ関数 ====================
+// 全ストリップを更新
+void showAllStrips() {
+  armLeft.show();
+  bodyLeft.show();
+  bodyRight.show();
+  armRight.show();
+  legRight.show();
+  legLeft.show();
+}
+
+// ==================== レインボー効果 ====================
+void rainbowCycleAll(uint8_t wait) {
+  uint16_t maxPixels = max(max(max(ARM_LEFT_LED, BODY_LEFT_LED), ARM_RIGHT_LED), LEG_RIGHT_LED);
+  
+  for (uint16_t j = 0; j < 256 * 5; j++) {
+    setRainbowStrip(&armLeft, j, maxPixels);
+    setRainbowStrip(&bodyLeft, j, maxPixels);
+    setRainbowStrip(&bodyRight, j, maxPixels);
+    setRainbowStrip(&armRight, j, maxPixels);
+    setRainbowStrip(&legRight, j, maxPixels);
+    setRainbowStrip(&legLeft, j, maxPixels);
+    showAllStrips();
+    delay(wait);
+  }
+}
+
+void setRainbowStrip(Adafruit_NeoPixel* strip, uint16_t j, uint16_t maxPixels) {
+  for (uint16_t i = 0; i < strip->numPixels(); i++) {
+    strip->setPixelColor(i, Wheel(((i * 256 / maxPixels) + j) & 255));
+  }
+}
 
 uint32_t Wheel(byte WheelPos) {
   WheelPos = 255 - WheelPos;
-  if(WheelPos < 85) {
+  if (WheelPos < 85) {
     return armLeft.Color(255 - WheelPos * 3, 0, WheelPos * 3, 0);
   }
-  if(WheelPos < 170) {
+  if (WheelPos < 170) {
     WheelPos -= 85;
     return armLeft.Color(0, WheelPos * 3, 255 - WheelPos * 3, 0);
   }
   WheelPos -= 170;
   return armLeft.Color(WheelPos * 3, 255 - WheelPos * 3, 0, 0);
-}
-
-void  random_all(uint32_t c, uint16_t time, uint8_t wait,uint8_t num) { /////ランダム点灯
- Adafruit_NeoPixel* strips1[] = { &armLeft};
- Adafruit_NeoPixel* strips2[] = { &bodyLeft};
- Adafruit_NeoPixel* strips3[] = { &bodyRight};
- Adafruit_NeoPixel* strips4[] = { &armRight};
- Adafruit_NeoPixel* strips5[] = { &legRight};
- Adafruit_NeoPixel* strips6[] = { &legLeft};    
-  uint32_t ledPosition_armLeft_LED;
-  uint32_t ledPosition_bodyLeft_LED;
-  uint32_t ledPosition_bodyRight_LED;
-  uint32_t ledPosition_armRight_LED;
-  uint32_t ledPosition_legRight_LED;
-  uint32_t ledPosition_legLeft_LED;
-  for (auto strip1 : strips1) {
-      for (auto strip2 : strips2) {
-          for (auto strip3 : strips3) {
-            for (auto strip4 : strips4) {
-              for (auto strip5 : strips5) {
-                for (auto strip6 : strips6) {
-                  for(uint16_t i=0; i<=time; i++){
-                   ledPosition_armLeft_LED = random(0, armLeft_LED);
-                   ledPosition_bodyLeft_LED=random(0, bodyLeft_LED);
-                   ledPosition_bodyRight_LED=random(0, bodyRight_LED);
-                   ledPosition_armRight_LED=random(0, armRight_LED);
-                   ledPosition_legRight_LED=random(0, legRight_LED);
-                   ledPosition_legLeft_LED=random(0, legLeft_LED);
-    
-                     for(uint16_t i=ledPosition_armLeft_LED; i<ledPosition_armLeft_LED + num; i++) {
-                         strip1->setPixelColor(i, c);
-                     }
-                     for(uint16_t i= ledPosition_bodyLeft_LED; i< ledPosition_bodyLeft_LED + num; i++) {
-                         strip2->setPixelColor(i, c);
-                     }
-                     for(uint16_t i=  ledPosition_bodyRight_LED; i<  ledPosition_bodyRight_LED + num; i++) {
-                         strip3->setPixelColor(i, c);
-                     }
-                     for(uint16_t i=  ledPosition_armRight_LED; i<  ledPosition_armRight_LED + num; i++) {
-                         strip4->setPixelColor(i, c);
-                     }
-                     for(uint16_t i=  ledPosition_legRight_LED; i<   ledPosition_legRight_LED + num; i++) {
-                        strip5->setPixelColor(i, c);
-                     }
-                     for(uint16_t i=   ledPosition_legLeft_LED; i<  ledPosition_legLeft_LED + num; i++) {
-                        strip6->setPixelColor(i, c);
-                     }
-        
-                     strip1->show();
-                     strip2->show();
-                     strip3->show();
-                     strip4->show();
-                     strip5->show();
-                     strip6->show();
-                     delay(wait);
-         
-                     for(uint16_t i=ledPosition_armLeft_LED; i<ledPosition_armLeft_LED + num; i++) {
-                        strip1->setPixelColor(i, armLeft.Color(0, 0, 0, 0));
-                     }
-                    for(uint16_t i= ledPosition_bodyLeft_LED; i< ledPosition_bodyLeft_LED + num; i++) {
-                        strip2->setPixelColor(i, armLeft.Color(0, 0, 0, 0));
-                    }
-                    for(uint16_t i= ledPosition_bodyRight_LED; i< ledPosition_bodyRight_LED + num; i++) {
-                        strip3->setPixelColor(i, armLeft.Color(0, 0, 0, 0));
-                    }
-                   for(uint16_t i=ledPosition_armRight_LED; i< ledPosition_armRight_LED + num; i++) {
-                       strip4->setPixelColor(i, armLeft.Color(0, 0, 0, 0));
-                    }
-                  for(uint16_t i= ledPosition_legRight_LED; i<  ledPosition_legRight_LED + num; i++) {
-                       strip5->setPixelColor(i, armLeft.Color(0, 0, 0, 0));
-                    }
-                 for(uint16_t i=  ledPosition_legLeft_LED; i<   ledPosition_legLeft_LED + num; i++) {
-                       strip6->setPixelColor(i, armLeft.Color(0, 0, 0, 0));
-                    }
-        
-                  strip1->show();
-                  strip2->show();
-                  strip3->show();
-                  strip4->show();
-                  strip5->show();
-                  strip6->show();
-  }
-}
-}
-}
-}
-}
-}
-}
-
-void colorWipeRange_wave_foot(uint32_t c, uint32_t wait) {  //足部分の下⇒上の点灯
- Adafruit_NeoPixel* strips5[] = { &legRight};
- Adafruit_NeoPixel* strips6[] = { &legLeft};  
-   for (auto strip5 : strips5) {
-       for (auto strip6 : strips6) {
-          for(uint16_t i=legRight_LED; i>0; i--) { //legRight_LED=legleft_LEDのため、legRight_LEDを使用
-                strip5->setPixelColor(i, c);
-                strip6->setPixelColor(i, c);   
-                strip5->show();
-                strip6->show();
-                delay(wait);
-               }
-
-          }
-}
-}
-
-void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {  //上半身部分の下⇒上の点灯
- Adafruit_NeoPixel* strips1[] = { &armLeft};
- Adafruit_NeoPixel* strips2[] = { &bodyLeft};
- Adafruit_NeoPixel* strips3[] = { &bodyRight};
- Adafruit_NeoPixel* strips4[] = { &armRight};
- uint32_t g=(armLeft_LED/2);
-  for (auto strip1 : strips1) {
-   for (auto strip2 : strips2) {
-       for (auto strip3 : strips3) {
-         for (auto strip4 : strips4) {        
-          for(uint16_t i=armLeft_LED; i>0; i--) { //armLeft_LED=bodyRigh_LED　かつarmLeft＿LEDが一番個数が多いためarmLeft_LEDを使用
-               
-                strip2->setPixelColor(i, c);
-                strip3->setPixelColor(i, c);   
-                strip2->show();
-                strip3->show();
-                delay(wait);
-                if (i>=(armLeft_LED/2)){
-                strip1->setPixelColor(i-(armLeft_LED/2+1), c);
-                strip4->setPixelColor(i-(armLeft_LED/2+1), c);   
-                strip1->show();               
-                strip4->show();   
-
-                strip1->setPixelColor(g, c);
-                strip4->setPixelColor(g, c);   
-                strip1->show();               
-                strip4->show();
-                g=g+1;;        
-                delay(wait);
-               }
-               
-
-          }
- }
-}
-}
-}
-}
-
-
-void suits_led_change(uint32_t color_on,uint32_t color_off,uint32_t time,uint32_t wait) {
-  Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
- for (uint16_t k = 0; k < time; k++) {
-       for (auto strip : strips) {
-           for (uint16_t i = 0; i < strip->numPixels(); i++) {
-             strip->setPixelColor(i, color_on);
-            }
-            strip->show();
-        }
-        
-        delay(wait);
-        
-       for (auto strip : strips) {
-           for (uint16_t i = 0; i < strip->numPixels(); i++) {
-             strip->setPixelColor(i, color_off);
-            }
-            strip->show();
-        }
-         delay(wait);
-  }
-}  
-
-//脛（すね）光るホールド
-void pulseWhite_series_sune_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-      setlegRightColor_sune(armLeft.Color(0, 0, 0, val));
-      setlegLeftColor_sune(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-    delay(100);
-  }
-}
-
-//太もも光る
-void pulseWhite_series_momo_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-      setlegRightColor(armLeft.Color(0, 0, 0, val));
-      setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-  
-    delay(100);
-  }
-}
-
-//腰　光る
-void pulseWhite_series_body_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-      setbodyLeftColor(armLeft.Color(0, 0, 0, val));
-      setbodyRightColor(armLeft.Color(0, 0, 0, val));
-     // setlegRightColor(armLeft.Color(0, 0, 0, val));
-     // setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-  
-    delay(100);
-  }
-}
-
-//アーム　光る
-void  pulseWhite_arm_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  for (uint16_t k = 0; k < time; k++) {
-    for (int j = 0; j < 256; j += speed) { 
-      uint8_t val = neopix_gamma[j];
-     setarmRightColor(armLeft.Color(0, 0, 0, val));
-     setarmLeftColor(armLeft.Color(0, 0, 0, val));
-     // setlegRightColor(armLeft.Color(0, 0, 0, val));
-     // setlegLeftColor(armLeft.Color(0, 0, 0, val));
-      delay(wait);
-    }
-  
-    delay(100);
-  }
-}
-
-//両腕腕5個ずつ移動する(腕⇒肩)
-void LEDtoCenter(uint32_t c, uint8_t wait, uint8_t num, uint8_t num_move,uint8_t time) {
- Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
-  Adafruit_NeoPixel* strips1[] = { &armLeft};//３６個
- Adafruit_NeoPixel* strips2[] = { &bodyLeft};//２７個
- Adafruit_NeoPixel* strips3[] = { &bodyRight};//２７個
- Adafruit_NeoPixel* strips4[] = { &armRight};//３６個
- Adafruit_NeoPixel* strips5[] = { &legRight};
- Adafruit_NeoPixel* strips6[] = { &legLeft};    
- uint8_t i;
- uint8_t g;
- uint8_t u;
- for (auto strip4 : strips4) {
-  for (auto strip1 : strips1) {
-    for (auto strip2 : strips2) {
-       for (auto strip3 : strips3) {
-          for (auto strip5 : strips5) {
-             for (auto strip6 : strips6) {
-            for (uint16_t k = 0; k < time; k++) {
-       i=0;
-       g=0;
-       u=legRight_LED;
-      for(uint16_t k=num; k >0 ; k--) {
-////////////////////////////////////////// ボディーの上⇒下
-         if(i < ((bodyLeft_LED)/2)-num_move){ 
-                strip2->setPixelColor(i, c);
-                strip3->setPixelColor(i, c);
-                strip2->show();
-                strip3->show();
-                i=i+1;
-          }
-////////////////////////////////////////
-//////////////////////////////////////// ボディーの下⇒上
-         if(k >= ((bodyLeft_LED)/2)-num_move){ 
-                strip2->setPixelColor(k, c);
-                strip3->setPixelColor(k, c);
-                strip2->show();
-                strip3->show();
-          }
-//////////////////////////////////////
-/////////////////////////////////////　アームの下⇒上         
-          if(k >= (armLeft_LED/2)){
-            strip1->setPixelColor((k-(armLeft_LED+2)/2), c);
-            strip4->setPixelColor((k-(armLeft_LED+2)/2), c);
-            strip1->show();
-            strip4->show();
-          }
-////////////////////////////////////
-//////////////////////////////////////// 足の下⇒上
-         if(u <= ((legRight_LED))){ 
-                strip5->setPixelColor(u, c);
-                strip6->setPixelColor(u, c);
-                strip5->show();
-                strip6->show();
-                 u=u-1;
-          }
-//////////////////////////////////////
-      
-//      if(armLeft_LED-k >= 0){
-//        strip->setPixelColor(armLeft_LED-k, c);
-//      }
-
-
-//      if(0+k <= armRight_LED){
-//        strip->setPixelColor(0+k, c);
-//      }
-//      if(armRight_LED-k >= 0){
-//        strip->setPixelColor(armRight_LED-k, c); 
-//      }
-// 
-
-    strip1->setPixelColor(k-num_move, armLeft.Color(0, 0, 0, 0));
-    strip2->setPixelColor(g-num_move, armLeft.Color(0, 0, 0, 0));
-    strip3->setPixelColor(g-num_move, armLeft.Color(0, 0, 0, 0));
-    strip2->setPixelColor(k+num_move, armLeft.Color(0, 0, 0, 0));
-    strip3->setPixelColor(k+num_move, armLeft.Color(0, 0, 0, 0));
-    strip4->setPixelColor(k-num_move, armLeft.Color(0, 0, 0, 0));
-    strip5->setPixelColor(k-num_move, armLeft.Color(0, 0, 0, 0));
-    strip6->setPixelColor(k-num_move, armLeft.Color(0, 0, 0, 0));
-    //strip1->setPixelColor((armLeft_LED-k)+num_move, armLeft.Color(0, 0, 0, 0));
-    strip1->show();
-    strip2->show();
-    strip3->show();
-    strip4->show();
-    strip5->show();
-    strip6->show();
-    delay(wait);
-    g=g+1;
-  }
-  
-}
-}
-}
-}
-}
-}
-}
 }
