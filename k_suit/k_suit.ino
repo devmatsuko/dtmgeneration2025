@@ -36,7 +36,7 @@
 
 // ==================== タイミング設定 ====================
 // 白点灯
-#define WHITE_ON_WAIT         40000  // 点灯時間
+#define WHITE_ON_WAIT         42000  // 開始待ち時間
 
 // 消灯
 #define WHITE_OFF_WAIT        7300   // 消灯時間
