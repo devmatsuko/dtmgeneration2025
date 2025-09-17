@@ -38,23 +38,56 @@ void setup() {
 
 void loop() {
   // 1. 全身に単色
-  setAllColor(armLeft.Color(255, 0, 0, 0)); // 赤
-  delay(1000);
-  setAllColor(armLeft.Color(0, 255, 0, 0)); // 緑
-  delay(1000);
-  setAllColor(armLeft.Color(0, 0, 255, 0)); // 青
-  delay(1000);
-  setAllColor(armLeft.Color(0, 0, 0, 255)); // 白
-  delay(1000);
+  //setAllColor(armLeft.Color(255, 0, 0, 0)); // 赤
+  //delay(1000);
+//  setAllColor(armLeft.Color(0, 255, 0, 0)); // 緑
+//  delay(1000);
+//  setAllColor(armLeft.Color(0, 0, 255, 0)); // 青
+//  delay(1000);
+  //setAllColor(armLeft.Color(0, 0, 0, 255)); // 白
+  //delay(1000);
 
   // 2. じわじわpulse
-  pulseWhiteAll(2, 5, 2);
+  //pulseWhiteAll(1, 100, 1);
 
   // 3. rainbow
-  rainbowCycleAll(10);
-  delay(10000);
+  //rainbowCycleAll(1000);
+
+  //setPartColor(armLeft.Color(255, 0, 0, 0), &armRight);
+
+
+  // 右腕だけランダムに5個のLEDを点滅、10ms間隔で1000回繰り返し
+  blinkRandomByPart(armLeft.Color(0, 0, 0, 255), &armRight, 10, 100, 5);
+  delay(1000);
+
+  // 全身ランダムに5個のLEDを点滅、10ms間隔で1000回繰り返し
+  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 10, 100, 10);
+  
+  delay(1000);
 }
 
+/**
+ * 指定した部位を指定した色で光らせる
+ * 
+ * @param color 色情報
+ * @param part  部位 
+ */
+void setPartColor(uint32_t color, Adafruit_NeoPixel* part) {
+  Adafruit_NeoPixel* strips[] = { part };
+  for (auto strip : strips) {
+    for (uint16_t i = 0; i < strip->numPixels(); i++) {
+      strip->setPixelColor(i, color);
+    }
+    strip->show();
+  }
+}
+
+
+
+
+/**
+ * 全身のLEDを引数のcolorで点灯
+ */
 void setAllColor(uint32_t color) {
   Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
   for (auto strip : strips) {
@@ -65,6 +98,13 @@ void setAllColor(uint32_t color) {
   }
 }
 
+/**
+ * 白点滅
+ * 
+ * @param time 
+ * @param wait 
+ * @param speed
+ */
 void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
   for (uint16_t k = 0; k < time; k++) {
     for (int j = 0; j < 256; j += speed) {
@@ -81,6 +121,11 @@ void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
   }
 }
 
+/**
+ * 全身レインボー。引数に応じて色の変化速度が変わるよ
+ * 
+ * @param wait  数値が低いと色の変化早くなるよ
+ */
 void rainbowCycleAll(uint8_t wait) {
   uint16_t maxPixels = 0;
   Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
@@ -99,6 +144,151 @@ void rainbowCycleAll(uint8_t wait) {
   }
 }
 
+
+
+
+
+
+
+
+
+
+/**
+ * 部位指定ランダムキラキラ
+ * 指定した部位で、指定したnumLEDsの数だけランダムな位置で同時に光らせる
+ * 
+ * @param color   色 
+ * @param part    光らせる部位
+ * @param wait    点滅間隔
+ * @param times   点滅回数
+ * @param numLEDs 同時に光らせるLED個数
+ */
+void blinkRandomByPart(uint32_t color, Adafruit_NeoPixel* part, uint16_t wait, uint16_t times, uint8_t numLEDs) {
+  uint16_t n = part->numPixels();
+
+  if (numLEDs > n) numLEDs = n; // LED数が多すぎたら調整
+
+  for (uint16_t t = 0; t < times; t++) {
+    // まず全消灯
+    for (uint16_t i = 0; i < n; i++) {
+      part->setPixelColor(i, 0);
+    }
+
+    // numLEDs 個のランダムで異なる位置を選ぶ
+    uint16_t selected[numLEDs];
+    uint8_t count = 0;
+
+    while (count < numLEDs) {
+      uint16_t idx = random(n);
+      bool duplicate = false;
+      for (uint8_t j = 0; j < count; j++) {
+        if (selected[j] == idx) {
+          duplicate = true;
+          break;
+        }
+      }
+      if (!duplicate) {
+        selected[count++] = idx;
+      }
+    }
+
+    // 選ばれたLEDを点灯
+    for (uint8_t i = 0; i < numLEDs; i++) {
+      part->setPixelColor(selected[i], color);
+    }
+
+    // 点灯して少し待つ
+    part->show();
+    delay(wait);
+
+    // 消灯
+    for (uint8_t i = 0; i < numLEDs; i++) {
+      part->setPixelColor(selected[i], 0);
+    }
+    part->show();
+    delay(wait);
+  }
+}
+
+/**
+ * 全身ランダムキラキラ
+ * 指定したnumLEDsの数だけランダムな位置で同時に光らせる
+ * 
+ * @param color   色 
+ * @param wait    点滅間隔
+ * @param times   点滅回数
+ * @param numLEDs 同時に光らせるLED個数
+ */
+void blinkRandomWholeBody(uint32_t color, uint16_t wait, uint16_t times, uint8_t numLEDs) {
+  const uint8_t totalParts = 6; // strips 配列の要素数
+  Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
+
+  // 各部位の LED 総数を計算
+  uint16_t partSizes[totalParts];
+  uint16_t totalLEDs = 0;
+  for (uint8_t i = 0; i < totalParts; i++) {
+    partSizes[i] = strips[i]->numPixels();
+    totalLEDs += partSizes[i];
+  }
+
+  for (uint16_t t = 0; t < times; t++) {
+    // まず全消灯
+    for (uint8_t i = 0; i < totalParts; i++) {
+      strips[i]->clear();
+    }
+
+    // numLEDs 個のランダムで異なるLEDを全身から選ぶ
+    uint16_t selected[numLEDs];
+    uint8_t count = 0;
+
+    while (count < numLEDs) {
+      uint16_t idx = random(totalLEDs); // 0～totalLEDs-1 の範囲
+      bool duplicate = false;
+      for (uint8_t j = 0; j < count; j++) {
+        if (selected[j] == idx) {
+          duplicate = true;
+          break;
+        }
+      }
+      if (!duplicate) {
+        selected[count++] = idx;
+      }
+    }
+
+    // 選ばれた全身LEDを点灯
+    for (uint8_t i = 0; i < numLEDs; i++) {
+      uint16_t idx = selected[i];
+      // idx がどの部位か判定
+      for (uint8_t p = 0; p < totalParts; p++) {
+        if (idx < partSizes[p]) {
+          strips[p]->setPixelColor(idx, color);
+          break;
+        } else {
+          idx -= partSizes[p];
+        }
+      }
+    }
+
+    // 点灯
+    for (uint8_t i = 0; i < totalParts; i++) {
+      strips[i]->show();
+    }
+
+    delay(wait);
+
+    // 消灯
+    for (uint8_t i = 0; i < totalParts; i++) {
+      strips[i]->clear();
+      strips[i]->show();
+    }
+
+    delay(wait);
+  }
+}
+
+
+
+
 uint32_t Wheel(byte WheelPos) {
   WheelPos = 255 - WheelPos;
   if(WheelPos < 85) {
@@ -110,4 +300,34 @@ uint32_t Wheel(byte WheelPos) {
   }
   WheelPos -= 170;
   return armLeft.Color(WheelPos * 3, 255 - WheelPos * 3, 0, 0);
+}
+
+
+
+/**
+ * 使わないかもだけど面白い光り方する（ランダムじわじわ）
+ */
+void lightAllRandom(uint32_t color, Adafruit_NeoPixel* part, uint16_t wait) {
+  uint16_t n = part->numPixels();
+
+  // インデックス配列を作成
+  uint16_t indices[n];
+  for (uint16_t i = 0; i < n; i++) {
+    indices[i] = i;
+  }
+
+  // フィッシャー–イェーツ法でシャッフル
+  for (uint16_t i = n - 1; i > 0; i--) {
+    uint16_t j = random(i + 1);
+    uint16_t tmp = indices[i];
+    indices[i] = indices[j];
+    indices[j] = tmp;
+  }
+
+  // ランダム順で1つずつ点灯
+  for (uint16_t k = 0; k < n; k++) {
+    part->setPixelColor(indices[k], color);
+    part->show();
+    delay(wait);  // 点灯間隔
+  }
 }
