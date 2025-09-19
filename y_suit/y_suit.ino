@@ -33,7 +33,7 @@
 #define PIN_LEG_LEFT   9
 
 // モード設定 (1:本番モード 2:開発モード)
-#define MODE 2
+#define MODE 1
 
 // ==================== タイミング設定 ====================
 // じわじわ光る（消える）
@@ -68,7 +68,7 @@
 
 // 中央への集光
 #define LED_CENTER_WAIT       1500  // 開始待ち時間
-#define LED_CENTER_SPEED      50    // 点灯速度
+#define LED_CENTER_SPEED      20    // 点灯速度
 #define LED_CENTER_NUM_MOVE   5     // 移動個数
 #define LED_CENTER_TIME       3     // 繰り返し回数
 #define LED_CENTER_OFFSET     2     // 位置調整
@@ -78,10 +78,12 @@
 #define THEATER_CHASE_SPEED   20    // 点灯速度
 #define THEATER_CHASE_TIME    60    // 繰り返し回数
 
+//カラーチェンジ
 #define LED_WHITE_TO_RED_WAIT    2000   // 白⇒赤の待ち時間
 #define LED_REDE_TO_WHITE_WAIT    2000   // 赤⇒白の待ち時間
 #define LED_CHANGECOLOR armLeft.Color(255, 0, 0, 0)//色
-
+#define LEDcolorchangeDISK_WAIT 5000//待ち時間
+#define LED_CHANGE_SPEED      50    // 点灯速度
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -189,6 +191,10 @@ void performMainSequence() {
   delay(THEATER_CHASE_WAIT);
   theaterChase(getWhiteColor(), THEATER_CHASE_SPEED, THEATER_CHASE_TIME);
 
+  delay(LEDcolorchangeDISK_WAIT);
+  LEDcolorchangeDISK(getWhiteColor(),LED_CHANGE_SPEED, ARM_LEFT_LED, 
+              LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
+              
   delay(10000000);
 }
 
