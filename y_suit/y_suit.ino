@@ -1,4 +1,3 @@
-//テスト
 /**
  * Yukichi LED Controller
  *
@@ -78,6 +77,13 @@
 #define THEATER_CHASE_WAIT    4500  // 開始待ち時間
 #define THEATER_CHASE_SPEED   20    // 点灯速度
 #define THEATER_CHASE_TIME    60    // 繰り返し回数
+
+//カラーチェンジ
+#define LED_WHITE_TO_RED_WAIT    2000   // 白⇒赤の待ち時間
+#define LED_REDE_TO_WHITE_WAIT    2000   // 赤⇒白の待ち時間
+#define LED_CHANGECOLOR armLeft.Color(255, 0, 0, 0)//色
+#define LEDcolorchangeDISK_WAIT 5000//待ち時間
+#define LED_CHANGE_SPEED      50    // 点灯速度
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -185,15 +191,17 @@ void performMainSequence() {
   delay(THEATER_CHASE_WAIT);
   theaterChase(getWhiteColor(), THEATER_CHASE_SPEED, THEATER_CHASE_TIME);
 
+  delay(LEDcolorchangeDISK_WAIT);
+  LEDcolorchangeDISK(getWhiteColor(),LED_CHANGE_SPEED, ARM_LEFT_LED, 
+              LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
+              
   delay(10000000);
 }
 
 void performDebugSequence() {
-  setAllColor(0);
-  LEDtoCenter(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
-              LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
-  setAllColor(0);
-  theaterChase(getWhiteColor(), THEATER_CHASE_SPEED, THEATER_CHASE_TIME);
+
+  LEDcolorchangeDISK(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
+              LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
   delay(10000000);
 }
 
@@ -554,3 +562,67 @@ uint32_t Wheel(byte WheelPos) {
   WheelPos -= 170;
   return armLeft.Color(WheelPos * 3, 255 - WheelPos * 3, 0, 0);
 }
+
+// ==================== 中央への集光 ====================
+void LEDcolorchangeDISK(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,uint8_t time, uint8_t offset,uint32_t wait2,uint32_t wait3,uint32_t changecolor) {
+  for (uint16_t t = 0; t < time; t++) {
+    uint8_t i = 0;
+    uint8_t g = 0;
+    uint8_t u = LEG_RIGHT_LED;
+    
+    for (uint16_t k = num; k > 0; k--) {
+
+      
+      // アーム下から上
+      if (k >= ARM_LEFT_LED / 2) {
+        uint16_t armPos = k - (ARM_LEFT_LED + 2) / 2;
+        armLeft.setPixelColor(armPos, c);
+        armRight.setPixelColor(armPos, c);
+        armLeft.show();
+        armRight.show();
+      }
+      
+      // 前のLEDを消灯
+      clearPreviousLEDs(k, g, numMove);
+      delay(wait);
+      g++;
+    }
+         for (uint16_t k = 12; k > 0; k--) {
+            bodyLeft.setPixelColor(k, c);
+            bodyRight.setPixelColor(k, c);
+         }
+            bodyLeft.show();
+            bodyRight.show();
+             delay(wait2);
+          for (uint16_t k = 12; k > 0; k--) {
+             bodyLeft.setPixelColor(k,changecolor);
+             bodyRight.setPixelColor(k,changecolor);
+         }
+            bodyLeft.show();
+            bodyRight.show();
+            delay(wait3);
+          for (uint16_t k = 12; k > 0; k--) {
+             bodyLeft.setPixelColor(k, armLeft.Color(0, 0, 0, 0));
+             bodyRight.setPixelColor(k, armLeft.Color(0, 0, 0, 0));
+             }
+            bodyLeft.show();
+            bodyRight.show(); 
+ 
+         for (uint16_t k = 0; k <= num; k++) {
+
+      // アーム上から下
+      if (k < ARM_LEFT_LED / 2) {
+        uint16_t armPos = k - (ARM_LEFT_LED + 2) / 2;
+        armLeft.setPixelColor(k,changecolor);
+        armRight.setPixelColor(k,changecolor);
+        armLeft.show();
+        armRight.show();
+      }
+      // 前のLEDを消灯
+      clearPreviousLEDs(k, g, numMove);
+      delay(wait);
+      g++;
+    }
+     
+      }
+  }
