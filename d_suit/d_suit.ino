@@ -37,33 +37,31 @@ void setup() {
 }
 
 void loop() {
-  // 1. 全身に単色
-  //setAllColor(armLeft.Color(255, 0, 0, 0)); // 赤
-  //delay(1000);
-//  setAllColor(armLeft.Color(0, 255, 0, 0)); // 緑
-//  delay(1000);
-//  setAllColor(armLeft.Color(0, 0, 255, 0)); // 青
-//  delay(1000);
-  //setAllColor(armLeft.Color(0, 0, 0, 255)); // 白
-  //delay(1000);
-
-  // 2. じわじわpulse
-  //pulseWhiteAll(1, 100, 1);
-
-  // 3. rainbow
-  //rainbowCycleAll(1000);
-
-  //setPartColor(armLeft.Color(255, 0, 0, 0), &armRight);
 
 
+  // ----- ドクターパート start -----
+  // 幕開いて登場：ランダムキラキラ
   // 右腕だけランダムに5個のLEDを点滅、10ms間隔で1000回繰り返し
   blinkRandomByPart(armLeft.Color(0, 0, 0, 255), &armRight, 10, 100, 5);
-  delay(1000);
 
-  // 全身ランダムに5個のLEDを点滅、10ms間隔で1000回繰り返し
-  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 10, 100, 10);
-  
-  delay(1000);
+  // 3人で前に歩く：ゆっくりF.I.&F.O.で明滅
+
+  // 二人ハケる直前のｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝ！:前半ｼﾞｬﾝｼﾞｬﾝで内から外へ、後半ｼﾞｬﾝｼﾞｬﾝ！で上から下へ
+
+  // ちょっとスーツ暗転
+
+  // ポイの光がスーツに吸い込まれる：体の中央から全身に光がチャージ
+
+  // サビ前（ポイでカウントダウン予定のとこ）：左右で違う部位がランダム点滅（部位単位で光る）
+
+  // サビ入りのテテテン！のとこ：テテテン！に合わせて全身に光が灯る（↑の「左右で違う部位がランダム点滅の応用でできないかなぁ）
+
+  // サビ？スウィングパート：全身白のままor8拍ずつで色変えたり何かしら変化させる？（ポイ振ってる時横向いてるから白のままでもいい気もする）
+
+  // スウィングパート終わりのジャンジャンジャンジャーン：ポイに合わせて半身ずつ白点灯、一瞬点灯してF.O.
+
+  // ----- ドクターパート end -----
+
 }
 
 /**
@@ -81,9 +79,6 @@ void setPartColor(uint32_t color, Adafruit_NeoPixel* part) {
     strip->show();
   }
 }
-
-
-
 
 /**
  * 全身のLEDを引数のcolorで点灯
@@ -144,18 +139,9 @@ void rainbowCycleAll(uint8_t wait) {
   }
 }
 
-
-
-
-
-
-
-
-
-
 /**
  * 部位指定ランダムキラキラ
- * 指定した部位で、指定したnumLEDsの数だけランダムな位置で同時に光らせる
+ * 指定した部位で指定したnumLEDsの数だけランダムな位置で同時に光らせる
  * 
  * @param color   色 
  * @param part    光らせる部位
@@ -286,9 +272,6 @@ void blinkRandomWholeBody(uint32_t color, uint16_t wait, uint16_t times, uint8_t
   }
 }
 
-
-
-
 uint32_t Wheel(byte WheelPos) {
   WheelPos = 255 - WheelPos;
   if(WheelPos < 85) {
@@ -302,10 +285,8 @@ uint32_t Wheel(byte WheelPos) {
   return armLeft.Color(WheelPos * 3, 255 - WheelPos * 3, 0, 0);
 }
 
-
-
 /**
- * 使わないかもだけど面白い光り方する（ランダムじわじわ）
+ * 使わないかもだけど面白い光り方する（ランダム侵食じわじわ）
  */
 void lightAllRandom(uint32_t color, Adafruit_NeoPixel* part, uint16_t wait) {
   uint16_t n = part->numPixels();
