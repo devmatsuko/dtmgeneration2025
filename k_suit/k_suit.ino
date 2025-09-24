@@ -35,16 +35,30 @@
 #define MODE 1
 
 // ==================== タイミング設定 ====================
+// 下から上への点灯
+#define WAVE_FOOT_WAIT        25000   // 開始待ち時間
+#define WAVE_TIME             10    // 点灯間隔
+#define WAVE_FOOT_WAIT2       1000   // 開始待ち時間
+
 // 白点灯
-#define WHITE_ON_WAIT         42000  // 開始待ち時間
+#define WHITE_ON_WAIT         15000  // 点灯時間
 
 // 消灯
 #define WHITE_OFF_WAIT        7300   // 消灯時間
 
 // 衣装切り替え
-#define SUITS_CHANGE_WAIT     2000   // 開始待ち時間
+#define SUITS_CHANGE_WAIT     2300   // 開始待ち時間
 #define SUITS_CHANGE_TIME     1      // 切替回数
 #define SUITS_CHANGE_SPACE    2000   // 切替間隔
+
+// 中央への集光　アーム
+#define LED_CENTER_WAIT       9500  // 開始待ち時間
+#define LED_CENTER_SPEED      20    // 点灯速度
+#define LED_CENTER_NUM_MOVE   5     // 移動個数
+#define LED_CENTER_TIME       3     // 繰り返し回数
+#define LED_CENTER_OFFSET     2     // 位置調整
+
+
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -105,9 +119,17 @@ void loop() {
 // ==================== シーケンス制御 ====================
 // メインシーケンス
 void performMainSequence() {
+      // 3. 下から上への点灯
+  delay(WAVE_FOOT_WAIT);
+  colorWipeRange_wave_foot(getWhiteColor(), WAVE_TIME);
+  colorWipeRange_wave_bodyarm(getWhiteColor(), WAVE_TIME);
+   delay(WAVE_FOOT_WAIT2);
+  setAllColor(0);
+
   // 1. 白色で全点灯
   delay(WHITE_ON_WAIT);
   setAllColor(getWhiteColor());
+ 
   
   // 2. 消灯
   delay(WHITE_OFF_WAIT);
@@ -117,6 +139,13 @@ void performMainSequence() {
   delay(SUITS_CHANGE_WAIT);
   suitsLedChange(getWhiteColor(), 0, SUITS_CHANGE_TIME, SUITS_CHANGE_SPACE);
   
+      // 4. 中央への集光　アーム
+  delay(LED_CENTER_WAIT);
+  setAllColor(0);
+  LEDtoCenter_arm(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
+              LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
+  setAllColor(0);
+
   // 終了（無限待機）
   delay(10000000);
 }
@@ -124,6 +153,17 @@ void performMainSequence() {
 // デバッグシーケンス
 void performDebugSequence() {
   // デバッグ用の処理をここに記述
+    // 3. 下から上への点灯
+  delay(WAVE_FOOT_WAIT);
+  colorWipeRange_wave_foot(getWhiteColor(), WAVE_TIME);
+  colorWipeRange_wave_bodyarm(getWhiteColor(), WAVE_TIME);
+
+      // 4. 中央への集光　アーム
+  delay(LED_CENTER_WAIT);
+  setAllColor(0);
+  LEDtoCenter_arm(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
+              LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
+  setAllColor(0);
   delay(10000000);
 }
 
@@ -332,4 +372,111 @@ void showAllStrips() {
   armRight.show();
   legRight.show();
   legLeft.show();
+}
+
+// ==================== 中央への集光 ====================
+void LEDtoCenter_arm(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove, 
+                 uint8_t time, uint8_t offset) {
+  for (uint16_t t = 0; t < time; t++) {
+    uint8_t i = 0;
+    uint8_t g = 0;
+    uint8_t u = LEG_RIGHT_LED;
+    
+    for (uint16_t k = num; k > 0; k--) {
+      // // ボディー上から下
+      // if (i < (BODY_LEFT_LED / 2) - numMove - offset) {
+      //   bodyLeft.setPixelColor(i, c);
+      //   bodyRight.setPixelColor(i, c);
+      //   bodyLeft.show();
+      //   bodyRight.show();
+      //   i++;
+      // }
+      
+      // // ボディー下から上
+      // if (k >= (BODY_LEFT_LED / 2) - numMove - offset) {
+      //   bodyLeft.setPixelColor(k, c);
+      //   bodyRight.setPixelColor(k, c);
+      //   bodyLeft.show();
+      //   bodyRight.show();
+      // }
+      
+      // アーム下から上
+      if (k >= ARM_LEFT_LED / 2) {
+        uint16_t armPos = k - (ARM_LEFT_LED + 2) / 2;
+        armLeft.setPixelColor(armPos, c);
+        armRight.setPixelColor(armPos, c);
+        armLeft.show();
+        armRight.show();
+      }
+      
+      // // 足下から上
+      // if (u <= k) {
+      //   legRight.setPixelColor(u, c);
+      //   legLeft.setPixelColor(u, c);
+      //   legRight.show();
+      //   legLeft.show();
+      //   u--;
+      // }
+      
+      // 前のLEDを消灯
+      clearPreviousLEDs(k, g, numMove);
+      delay(wait);
+      g++;
+    }
+  }
+}
+
+void clearPreviousLEDs(uint16_t k, uint8_t g, uint8_t numMove) {
+  bodyLeft.setPixelColor(g - numMove, 0);
+  bodyRight.setPixelColor(g - numMove, 0);
+  bodyLeft.setPixelColor(k + numMove, 0);
+  bodyRight.setPixelColor(k + numMove, 0);
+  armLeft.setPixelColor(k - numMove - (19 - numMove * 2), 0);
+  armRight.setPixelColor(k - numMove - (19 - numMove * 2), 0);
+  legRight.setPixelColor(k - numMove - (15 - numMove * 2), 0);
+  legLeft.setPixelColor(k - numMove - (15 - numMove * 2), 0);
+  
+  armLeft.show();
+  bodyLeft.show();
+  bodyRight.show();
+  armRight.show();
+  legRight.show();
+  legLeft.show();
+}
+
+// ==================== ウェーブ効果 ====================
+void colorWipeRange_wave_foot(uint32_t c, uint32_t wait) {
+  for (uint16_t i = LEG_RIGHT_LED; i > 0; i--) {
+    legRight.setPixelColor(i, c);
+    legLeft.setPixelColor(i, c);
+    legRight.show();
+    legLeft.show();
+    delay(wait);
+  }
+}
+
+void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
+  uint32_t g = ARM_LEFT_LED / 2;
+  
+  for (uint16_t i = ARM_LEFT_LED; i > 0; i--) {
+    // ボディー部分
+    bodyLeft.setPixelColor(i, c);
+    bodyRight.setPixelColor(i, c);
+    bodyLeft.show();
+    bodyRight.show();
+    delay(wait);
+    
+    // アーム部分
+    if (i >= ARM_LEFT_LED / 2) {
+      uint16_t armPos = i - (ARM_LEFT_LED / 2 + 1);
+      armLeft.setPixelColor(armPos, c);
+      armRight.setPixelColor(armPos, c);
+      armLeft.setPixelColor(g, c);
+      armRight.setPixelColor(g, c);
+      armLeft.show();
+      armRight.show();
+      g++;
+      delay(wait);
+    }
+  }
 }
