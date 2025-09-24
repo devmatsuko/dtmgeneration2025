@@ -11,7 +11,7 @@ int currentIndex = 0;
 bool animationFinished = false;
 #define LED_on_wait  68500
 #define LED_disk_speed  20
-#define LED_off_wait  4000
+#define LED_off_wait  3000
 int test = 2;//1:本モード,2:開発モード
 
 void setup() {
