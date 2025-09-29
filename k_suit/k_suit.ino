@@ -51,8 +51,15 @@
 #define SUITS_CHANGE_TIME     1      // 切替回数
 #define SUITS_CHANGE_SPACE    2000   // 切替間隔
 
+// じわじわ光る（消えない）
+#define PULSE_HOLD_WAIT       0     // 開始待ち時間
+#define PULSE_HOLD_WAIT2      7250  // 部位間待ち時間
+#define PULSE_HOLD_TIME       1     // 点滅回数
+#define PULSE_HOLD_SPACE      5     // 点滅間隔
+#define PULSE_HOLD_SPEED      3     // 点灯速度
+
 // 中央への集光　アーム
-#define LED_CENTER_WAIT       9500  // 開始待ち時間
+#define LED_CENTER_WAIT       1500  // 開始待ち時間
 #define LED_CENTER_SPEED      20    // 点灯速度
 #define LED_CENTER_NUM_MOVE   5     // 移動個数
 #define LED_CENTER_TIME       3     // 繰り返し回数
@@ -139,6 +146,10 @@ void performMainSequence() {
   delay(SUITS_CHANGE_WAIT);
   suitsLedChange(getWhiteColor(), 0, SUITS_CHANGE_TIME, SUITS_CHANGE_SPACE);
   
+  // 6. じわじわ光る（脛→もも→腰→アーム）消えない
+    delay(PULSE_HOLD_WAIT2);
+  pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+
       // 4. 中央への集光　アーム
   delay(LED_CENTER_WAIT);
   setAllColor(0);
@@ -153,17 +164,15 @@ void performMainSequence() {
 // デバッグシーケンス
 void performDebugSequence() {
   // デバッグ用の処理をここに記述
-    // 3. 下から上への点灯
-  delay(WAVE_FOOT_WAIT);
-  colorWipeRange_wave_foot(getWhiteColor(), WAVE_TIME);
-  colorWipeRange_wave_bodyarm(getWhiteColor(), WAVE_TIME);
-
-      // 4. 中央への集光　アーム
-  delay(LED_CENTER_WAIT);
-  setAllColor(0);
-  LEDtoCenter_arm(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
-              LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
-  setAllColor(0);
+  // 6. じわじわ光る（脛→もも→腰→アーム）消えない
+  // delay(PULSE_HOLD_WAIT);
+  // pulseWhite_series_sune_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+  // delay(PULSE_HOLD_WAIT2);
+  // pulseWhite_series_momo_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+  // delay(PULSE_HOLD_WAIT2);
+  // pulseWhite_series_body_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+  delay(PULSE_HOLD_WAIT2);
+  pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
   delay(10000000);
 }
 
@@ -229,6 +238,39 @@ void setLegRightShin(uint32_t color) {
 
 // 左脛
 void setLegLeftShin(uint32_t color) {
+  setStripColor(&legLeft, color, 11, legLeft.numPixels());
+}
+
+
+void setarmLeftColor(uint32_t color) {
+  setStripColor(&armLeft, color, 0, armLeft.numPixels());
+}
+
+void setarmRightColor(uint32_t color) {
+  setStripColor(&armRight, color, 0, armRight.numPixels());
+}
+
+void setbodyLeftColor(uint32_t color) {
+  setStripColor(&bodyLeft, color, 0, bodyLeft.numPixels());
+}
+
+void setbodyRightColor(uint32_t color) {
+  setStripColor(&bodyRight, color, 0, bodyRight.numPixels());
+}
+
+void setlegRightColor(uint32_t color) {
+  setStripColor(&legRight, color, 0, legRight.numPixels() - 10);
+}
+
+void setlegLeftColor(uint32_t color) {
+  setStripColor(&legLeft, color, 0, legLeft.numPixels() - 10);
+}
+
+void setlegRightColor_sune(uint32_t color) {
+  setStripColor(&legRight, color, 11, legRight.numPixels());
+}
+
+void setlegLeftColor_sune(uint32_t color) {
   setStripColor(&legLeft, color, 11, legLeft.numPixels());
 }
 
@@ -480,3 +522,25 @@ void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
     }
   }
 }
+
+
+// 脛光る（ホールド）
+void pulseWhite_series_sune_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor_sune, setlegLeftColor_sune, time, wait, speed, false);
+}
+
+// 太もも光る（ホールド）
+void pulseWhite_series_momo_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor, setlegLeftColor, time, wait, speed, false);
+}
+
+// 腰光る（ホールド）
+void pulseWhite_series_body_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, false);
+}
+
+// アーム光る（ホールド）
+void pulseWhite_arm_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setarmRightColor, setarmLeftColor, time, wait, speed, false);
+}
+
