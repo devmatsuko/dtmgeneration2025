@@ -73,17 +73,38 @@
 #define LED_CENTER_TIME       3     // 繰り返し回数
 #define LED_CENTER_OFFSET     2     // 位置調整
 
-// シアターチェイス
-#define THEATER_CHASE_WAIT    4500  // 開始待ち時間
+// シアターチェイス パチ屋
+#define THEATER_CHASE_WAIT    4300  // 開始待ち時間
 #define THEATER_CHASE_SPEED   20    // 点灯速度
-#define THEATER_CHASE_TIME    60    // 繰り返し回数
+#define THEATER_CHASE_TIME    30    // 繰り返し回数
 
 //カラーチェンジ
 #define LED_WHITE_TO_RED_WAIT    2000   // 白⇒赤の待ち時間
 #define LED_REDE_TO_WHITE_WAIT    2000   // 赤⇒白の待ち時間
-#define LED_CHANGECOLOR armLeft.Color(255, 0, 0, 0)//色
+#define LED_CHANGECOLOR armLeft.Color(255, 0, 55, 0)//色
 #define LEDcolorchangeDISK_WAIT 5000//待ち時間
 #define LED_CHANGE_SPEED      50    // 点灯速度
+
+//左腕のひかり
+#define SET_LEFTARM_WAIT_START 4000//点灯待ち時間
+#define SET_LEFTARM_WAIT_END 1000//消灯待ち時間
+
+//みぎ足のひかり
+#define SET_RIGHTLEG_WAIT_START 1000//点灯待ち時間
+#define SET_RIGHTLEG_WAIT_END 1000//消灯待ち時間
+
+//LED の移動
+#define LEDMOVE_WAIT 3500//待ち時間
+#define LED_MOVE_NUM 5    // 移動個数
+#define LED_MOVE_COLOR armLeft.Color(0, 0, 0, 255)//色
+#define LED_MOVE_SPEED      20    // 点灯速度
+#define LEDMOVE_RIGHT_START 17//右腕スタート地点
+#define LEDMOVE_RIGHT_END 0//右腕地点エンド地点
+#define LEDMOVE_LEFT_START 0//左腕スタート地点
+#define LEDMOVE_LEFT_END 17//左腕地点エンド地点
+
+
+//(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -190,7 +211,23 @@ void performMainSequence() {
   // 8. パチ屋
   delay(THEATER_CHASE_WAIT);
   theaterChase(getWhiteColor(), THEATER_CHASE_SPEED, THEATER_CHASE_TIME);
+  
+  //左腕の光る
+  delay(SET_LEFTARM_WAIT_START);
+  set_leftarm_Color(getWhiteColor());
+  delay(SET_LEFTARM_WAIT_END);
+  setAllColor(0);
 
+    //右足の光る
+  delay(SET_RIGHTLEG_WAIT_START);
+   set_rightleg_Color(getWhiteColor());
+  delay(SET_RIGHTLEG_WAIT_END);
+  setAllColor(0);
+   
+   //LED移動
+  delay(LEDMOVE_WAIT);
+  LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
+    
   delay(LEDcolorchangeDISK_WAIT);
   LEDcolorchangeDISK(getWhiteColor(),LED_CHANGE_SPEED, ARM_LEFT_LED, 
               LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
@@ -200,14 +237,31 @@ void performMainSequence() {
 
 void performDebugSequence() {
 
-  LEDcolorchangeDISK(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
-              LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
+ delay(LEDMOVE_WAIT);
+ LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
+        
   delay(10000000);
 }
 
 // ==================== 色設定関数 ====================
 uint32_t getWhiteColor() {
   return armLeft.Color(0, 0, 0, 255);
+}
+
+void set_body_left_Color(uint32_t color) {
+  setStripColor_body(&bodyLeft, color, 0, 13);
+}
+
+void set_body_right_Color(uint32_t color) {
+  setStripColor_body(&bodyRight, color, 0, 13);
+}
+
+void set_leftarm_Color(uint32_t color) {
+  setStripColor_left_arm(&armLeft, color, 8, 18);
+}
+
+void set_rightleg_Color(uint32_t color) {
+  setStripColor_right_leg(&legRight, color, 11, 21);
 }
 
 void setAllColor(uint32_t color) {
@@ -217,6 +271,27 @@ void setAllColor(uint32_t color) {
   setStripColor(&armRight, color, 0, armRight.numPixels());
   setStripColor(&legRight, color, 0, legRight.numPixels());
   setStripColor(&legLeft, color, 0, legLeft.numPixels());
+}
+
+void setStripColor_body(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
+  for (uint16_t i = start; i < end; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
+}
+
+void setStripColor_left_arm(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
+  for (uint16_t i = start; i < end; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
+}
+
+void setStripColor_right_leg(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
+  for (uint16_t i = start; i < end; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
 }
 
 void setStripColor(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
@@ -563,7 +638,7 @@ uint32_t Wheel(byte WheelPos) {
   return armLeft.Color(WheelPos * 3, 255 - WheelPos * 3, 0, 0);
 }
 
-// ==================== 中央への集光 ====================
+// ==================== カラーチェンジ用 ====================
 void LEDcolorchangeDISK(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,uint8_t time, uint8_t offset,uint32_t wait2,uint32_t wait3,uint32_t changecolor) {
   for (uint16_t t = 0; t < time; t++) {
     uint8_t i = 0;
@@ -626,3 +701,46 @@ void LEDcolorchangeDISK(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,u
      
       }
   }
+
+  // ==================== LED移動用 ====================
+
+void LEDMOVE(uint32_t c, uint8_t wait,uint32_t right_start,uint32_t right_end,uint32_t num,uint32_t left_start,uint32_t left_end,int32_t ledmovenum) {
+
+  for(int16_t k=num; k>= -ledmovenum; k--) {//右から左
+
+         armRight.setPixelColor(k, c);
+         armRight.show();
+         armRight.setPixelColor(k+ledmovenum, armRight.Color(0,0,0));
+         armRight.show();
+
+    delay(wait);
+  }
+
+  //ボディーの光る
+   set_body_right_Color(getWhiteColor());
+   delay(wait+50);
+   setAllColor(0);
+   set_body_left_Color(getWhiteColor());
+   delay(wait+50);
+   setAllColor(0);
+
+  for(int16_t k=0; k <= num+ledmovenum; k++) {//左から右
+       if (k <= num) {
+        armLeft.setPixelColor(k, c);
+        armLeft.show();
+        armLeft.setPixelColor(k-ledmovenum, armLeft.Color(0,0,0));
+        armLeft.show();
+         delay(wait);
+       }
+        
+
+       if (k > num) { //移動LED個数を最後消灯させる
+             for(int16_t i=ledmovenum; i>=0 ; i--) {
+              armLeft.setPixelColor(k-i, armLeft.Color(0,0,0));
+              armLeft.show();
+              delay(wait);
+             }
+        }
+   
+  }
+}
