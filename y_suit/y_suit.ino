@@ -78,13 +78,6 @@
 #define THEATER_CHASE_SPEED   20    // 点灯速度
 #define THEATER_CHASE_TIME    30    // 繰り返し回数
 
-//カラーチェンジ
-#define LED_WHITE_TO_RED_WAIT    2000   // 白⇒赤の待ち時間
-#define LED_REDE_TO_WHITE_WAIT    2000   // 赤⇒白の待ち時間
-#define LED_CHANGECOLOR armLeft.Color(255, 0, 55, 0)//色
-#define LEDcolorchangeDISK_WAIT 5000//待ち時間
-#define LED_CHANGE_SPEED      50    // 点灯速度
-
 //左腕のひかり
 #define SET_LEFTARM_WAIT_START 4000//点灯待ち時間
 #define SET_LEFTARM_WAIT_END 1000//消灯待ち時間
@@ -94,14 +87,22 @@
 #define SET_RIGHTLEG_WAIT_END 1000//消灯待ち時間
 
 //LED の移動
-#define LEDMOVE_WAIT 3500//待ち時間
+#define LEDMOVE_WAIT 3300//待ち時間
 #define LED_MOVE_NUM 5    // 移動個数
 #define LED_MOVE_COLOR armLeft.Color(0, 0, 0, 255)//色
-#define LED_MOVE_SPEED      20    // 点灯速度
+#define LED_MOVE_SPEED      10    // 点灯速度
 #define LEDMOVE_RIGHT_START 17//右腕スタート地点
 #define LEDMOVE_RIGHT_END 0//右腕地点エンド地点
 #define LEDMOVE_LEFT_START 0//左腕スタート地点
 #define LEDMOVE_LEFT_END 17//左腕地点エンド地点
+
+
+//カラーチェンジ
+#define LED_WHITE_TO_RED_WAIT    2000   // 白⇒赤の待ち時間
+#define LED_REDE_TO_WHITE_WAIT    2000   // 赤⇒白の待ち時間
+#define LED_CHANGECOLOR armLeft.Color(255, 0, 55, 0)//色
+#define LEDcolorchangeDISK_WAIT 5000//待ち時間
+#define LED_CHANGE_SPEED      20    // 点灯速度
 
 
 //(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
