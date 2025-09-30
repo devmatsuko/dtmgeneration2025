@@ -60,12 +60,20 @@
 
 // 中央への集光　アーム
 #define LED_CENTER_WAIT       1500  // 開始待ち時間
-#define LED_CENTER_SPEED      20    // 点灯速度
+#define LED_CENTER_SPEED      20    // 点灯速度 
 #define LED_CENTER_NUM_MOVE   5     // 移動個数
 #define LED_CENTER_TIME       3     // 繰り返し回数
 #define LED_CENTER_OFFSET     2     // 位置調整
 
-
+//LED の移動
+#define LEDMOVE_WAIT 18700//待ち時間
+#define LED_MOVE_NUM 5    // 移動個数
+#define LED_MOVE_COLOR armLeft.Color(0, 0, 0, 255)//色
+#define LED_MOVE_SPEED  10 // 点灯速度 20
+#define LEDMOVE_RIGHT_START 17//右腕スタート地点
+#define LEDMOVE_RIGHT_END 0//右腕地点エンド地点
+#define LEDMOVE_LEFT_START 0//左腕スタート地点
+#define LEDMOVE_LEFT_END 17//左腕地点エンド地点
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -147,15 +155,20 @@ void performMainSequence() {
   suitsLedChange(getWhiteColor(), 0, SUITS_CHANGE_TIME, SUITS_CHANGE_SPACE);
   
   // 6. じわじわ光る（脛→もも→腰→アーム）消えない
-    delay(PULSE_HOLD_WAIT2);
-  pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+   delay(PULSE_HOLD_WAIT2);
+   pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
 
       // 4. 中央への集光　アーム
-  delay(LED_CENTER_WAIT);
-  setAllColor(0);
-  LEDtoCenter_arm(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
+   delay(LED_CENTER_WAIT);
+   setAllColor(0);
+   LEDtoCenter_arm(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
               LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
-  setAllColor(0);
+   setAllColor(0);
+
+   //LEDの移動
+   delay(LEDMOVE_WAIT);
+   LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
+    
 
   // 終了（無限待機）
   delay(10000000);
@@ -164,15 +177,9 @@ void performMainSequence() {
 // デバッグシーケンス
 void performDebugSequence() {
   // デバッグ用の処理をここに記述
-  // 6. じわじわ光る（脛→もも→腰→アーム）消えない
-  // delay(PULSE_HOLD_WAIT);
-  // pulseWhite_series_sune_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
-  // delay(PULSE_HOLD_WAIT2);
-  // pulseWhite_series_momo_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
-  // delay(PULSE_HOLD_WAIT2);
-  // pulseWhite_series_body_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
-  delay(PULSE_HOLD_WAIT2);
-  pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+ delay(LEDMOVE_WAIT);
+ LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
+    
   delay(10000000);
 }
 
@@ -181,6 +188,24 @@ void performDebugSequence() {
 uint32_t getWhiteColor() {
   return armLeft.Color(0, 0, 0, 255);
 }
+
+void set_body_left_Color(uint32_t color) {
+  setStripColor_body(&bodyLeft, color, 0, 13);
+}
+
+void set_body_right_Color(uint32_t color) {
+  setStripColor_body(&bodyRight, color, 0, 13);
+}
+
+void set_leftarm_Color(uint32_t color) {
+  setStripColor_left_arm(&armLeft, color, 8, 18);
+}
+
+void set_rightleg_Color(uint32_t color) {
+  setStripColor_right_leg(&legRight, color, 11, 21);
+}
+
+
 
 // 全LED一括設定
 void setAllColor(uint32_t color) {
@@ -194,6 +219,27 @@ void setAllColor(uint32_t color) {
 
 // ストリップ色設定
 void setStripColor(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
+  for (uint16_t i = start; i < end; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
+}
+
+void setStripColor_body(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
+  for (uint16_t i = start; i < end; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
+}
+
+void setStripColor_left_arm(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
+  for (uint16_t i = start; i < end; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
+}
+
+void setStripColor_right_leg(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
   for (uint16_t i = start; i < end; i++) {
     strip->setPixelColor(i, color);
   }
@@ -544,3 +590,50 @@ void pulseWhite_arm_hold(uint16_t time, uint8_t wait, uint8_t speed) {
   pulseEffect(setarmRightColor, setarmLeftColor, time, wait, speed, false);
 }
 
+// ==================== LED移動用 ====================
+
+void LEDMOVE(uint32_t c, uint8_t wait,uint32_t right_start,uint32_t right_end,uint32_t num,uint32_t left_start,uint32_t left_end,int32_t ledmovenum) {
+uint32_t komatsu_move_Led;
+komatsu_move_Led=ARM_LEFT_LED;
+  for(int16_t k=num; k>= -ledmovenum; k--) {//右から左
+    
+         armRight.setPixelColor(k, c);
+         armRight.show();
+         armRight.setPixelColor(k+ledmovenum, armRight.Color(0,0,0));
+         armRight.show();
+
+    delay(wait);
+  }
+
+  //ボディーの光る
+   set_body_right_Color(getWhiteColor());
+   delay(wait+50);
+   setAllColor(0);
+   set_body_left_Color(getWhiteColor());
+   delay(wait+50);
+   setAllColor(0);
+
+  for(int16_t k=0; k <= num+ledmovenum; k++) {//左から右
+       if (k <= num) {
+        komatsu_move_Led=komatsu_move_Led-1;
+        armLeft.setPixelColor(k, c);
+        armLeft.setPixelColor(komatsu_move_Led, c);
+        armLeft.show();
+        armLeft.setPixelColor(k-ledmovenum, armLeft.Color(0,0,0));
+        armLeft.setPixelColor(komatsu_move_Led+ledmovenum, armLeft.Color(0,0,0));
+        armLeft.show();
+         delay(wait);
+       }
+        
+
+       if (k > num) { //移動LED個数を最後消灯させる
+             for(int16_t i=ledmovenum; i>=0 ; i--) {
+              armLeft.setPixelColor(k-i, armLeft.Color(0,0,0));
+              armLeft.setPixelColor(komatsu_move_Led+i, armLeft.Color(0,0,0));
+              armLeft.show();
+              delay(wait);
+             }
+        }
+   
+  }
+}
