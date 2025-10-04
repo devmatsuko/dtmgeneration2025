@@ -220,10 +220,10 @@ void performMainSequence() {
   setAllColor(0);
 
     //右足の光る
-  delay(SET_RIGHTLEG_WAIT_START);
+   delay(SET_RIGHTLEG_WAIT_START);
    set_rightleg_Color(getWhiteColor());
-  delay(SET_RIGHTLEG_WAIT_END);
-  setAllColor(0);
+   delay(SET_RIGHTLEG_WAIT_END);
+   setAllColor(0);
    
    //LED移動
   delay(LEDMOVE_WAIT);
@@ -262,7 +262,7 @@ void set_leftarm_Color(uint32_t color) {
 }
 
 void set_rightleg_Color(uint32_t color) {
-  setStripColor_right_leg(&legRight, color, 11, 21);
+  setStripColor_right_leg(&legRight, color, 0, 10);
 }
 
 void setAllColor(uint32_t color) {
