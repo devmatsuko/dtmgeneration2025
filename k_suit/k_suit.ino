@@ -35,8 +35,21 @@
 #define MODE 1
 
 // ==================== タイミング設定 ====================
+// じわじわ光る（消える）
+#define PULSE_WHITE_WAIT      7500  // 開始待ち時間
+#define PULSE_WHITE_WAIT2     1500  // 部位間待ち時間
+#define PULSE_WHITE_TIME      1     // 点滅回数
+#define PULSE_WHITE_SPACE     5     // 点滅間隔
+#define PULSE_WHITE_SPEED     1     // 点灯速度
+
+// ランダム点灯
+#define RANDOM_ALL_WAIT       1000  // 1回目の待ち時間
+#define RANDOM_ALL_TIME       25    // 点灯回数
+#define RANDOM_ALL_SPACE      50    // 点灯間隔
+#define RANDOM_ALL_NUM        5     // 同時点灯個数
+
 // 下から上への点灯
-#define WAVE_FOOT_WAIT        25000   // 開始待ち時間
+#define WAVE_FOOT_WAIT        500   // 開始待ち時間
 #define WAVE_TIME             10    // 点灯間隔
 #define WAVE_FOOT_WAIT2       1000   // 開始待ち時間
 
@@ -134,11 +147,25 @@ void loop() {
 // ==================== シーケンス制御 ====================
 // メインシーケンス
 void performMainSequence() {
-      // 3. 下から上への点灯
+    // 1. じわじわ光る（脛→もも→腰→アーム）消える
+  delay(PULSE_WHITE_WAIT);
+  pulseWhite_series_sune(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+  delay(PULSE_WHITE_WAIT2);
+  pulseWhite_series_momo(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+  delay(PULSE_WHITE_WAIT2);
+  pulseWhite_series_body(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+  delay(PULSE_WHITE_WAIT2);
+  pulseWhite_arm(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
+
+  // 2. ランダム点灯（1回目）
+  delay(RANDOM_ALL_WAIT);
+  random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+
+  // 3. 下から上への点灯
   delay(WAVE_FOOT_WAIT);
   colorWipeRange_wave_foot(getWhiteColor(), WAVE_TIME);
   colorWipeRange_wave_bodyarm(getWhiteColor(), WAVE_TIME);
-   delay(WAVE_FOOT_WAIT2);
+  delay(WAVE_FOOT_WAIT2);
   setAllColor(0);
 
   // 1. 白色で全点灯
@@ -321,6 +348,79 @@ void setlegLeftColor_sune(uint32_t color) {
 }
 
 // ==================== エフェクト関数 ====================
+
+
+// 脛（すね）光る
+void pulseWhite_series_sune(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor_sune, setlegLeftColor_sune, time, wait, speed, true);
+}
+
+// 太もも光る
+void pulseWhite_series_momo(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor, setlegLeftColor, time, wait, speed, true);
+}
+
+// 腰光る
+void pulseWhite_series_body(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, true);
+}
+
+// アーム光る
+void pulseWhite_arm(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setarmRightColor, setarmLeftColor, time, wait, speed, true);
+}
+
+// 脛光る（ホールド）
+void pulseWhite_series_sune_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor_sune, setlegLeftColor_sune, time, wait, speed, false);
+}
+
+// 太もも光る（ホールド）
+void pulseWhite_series_momo_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setlegRightColor, setlegLeftColor, time, wait, speed, false);
+}
+
+// 腰光る（ホールド）
+void pulseWhite_series_body_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, false);
+}
+
+// アーム光る（ホールド）
+void pulseWhite_arm_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setarmRightColor, setarmLeftColor, time, wait, speed, false);
+}
+
+// ==================== ランダム点灯 ====================
+void random_all(uint32_t c, uint16_t time, uint8_t wait, uint8_t num) {
+  for (uint16_t t = 0; t <= time; t++) {
+    // ランダム位置を生成して点灯
+    uint32_t positions[6];
+    positions[0] = random(0, ARM_LEFT_LED);
+    positions[1] = random(0, BODY_LEFT_LED);
+    positions[2] = random(0, BODY_RIGHT_LED);
+    positions[3] = random(0, ARM_RIGHT_LED);
+    positions[4] = random(0, LEG_RIGHT_LED);
+    positions[5] = random(0, LEG_LEFT_LED);
+    
+    // 点灯
+    setRandomPixels(&armLeft, positions[0], num, c);
+    setRandomPixels(&bodyLeft, positions[1], num, c);
+    setRandomPixels(&bodyRight, positions[2], num, c);
+    setRandomPixels(&armRight, positions[3], num, c);
+    setRandomPixels(&legRight, positions[4], num, c);
+    setRandomPixels(&legLeft, positions[5], num, c);
+    
+    delay(wait);
+    
+    // 消灯
+    setRandomPixels(&armLeft, positions[0], num, 0);
+    setRandomPixels(&bodyLeft, positions[1], num, 0);
+    setRandomPixels(&bodyRight, positions[2], num, 0);
+    setRandomPixels(&armRight, positions[3], num, 0);
+    setRandomPixels(&legRight, positions[4], num, 0);
+    setRandomPixels(&legLeft, positions[5], num, 0);
+  }
+}
 // 衣装切り替えエフェクト
 void suitsLedChange(uint32_t colorOn, uint32_t colorOff, uint32_t time, uint32_t wait) {
   for (uint16_t k = 0; k < time; k++) {
@@ -334,6 +434,13 @@ void suitsLedChange(uint32_t colorOn, uint32_t colorOff, uint32_t time, uint32_t
   }
 }
 
+void setRandomPixels(Adafruit_NeoPixel* strip, uint32_t pos, uint8_t num, uint32_t color) {
+  uint16_t maxPos = strip->numPixels();
+  for (uint16_t i = pos; i < pos + num && i < maxPos; i++) {
+    strip->setPixelColor(i, color);
+  }
+  strip->show();
+}
 // ==================== パルスエフェクト（未使用だが利用可能） ====================
 // 全体パルス
 void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
@@ -355,8 +462,7 @@ void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
 }
 
 // パルスエフェクト共通処理
-void pulseEffect(void (*setColorFunc1)(uint32_t), void (*setColorFunc2)(uint32_t), 
-                 uint16_t time, uint8_t wait, uint8_t speed, bool fadeOut) {
+void pulseEffect(void (*setColorFunc1)(uint32_t), void (*setColorFunc2)(uint32_t),uint16_t time, uint8_t wait, uint8_t speed, bool fadeOut) {
   for (uint16_t k = 0; k < time; k++) {
     // フェードイン
     for (int j = 0; j < 256; j += speed) {
@@ -570,25 +676,6 @@ void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
 }
 
 
-// 脛光る（ホールド）
-void pulseWhite_series_sune_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  pulseEffect(setlegRightColor_sune, setlegLeftColor_sune, time, wait, speed, false);
-}
-
-// 太もも光る（ホールド）
-void pulseWhite_series_momo_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  pulseEffect(setlegRightColor, setlegLeftColor, time, wait, speed, false);
-}
-
-// 腰光る（ホールド）
-void pulseWhite_series_body_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, false);
-}
-
-// アーム光る（ホールド）
-void pulseWhite_arm_hold(uint16_t time, uint8_t wait, uint8_t speed) {
-  pulseEffect(setarmRightColor, setarmLeftColor, time, wait, speed, false);
-}
 
 // ==================== LED移動用 ====================
 
