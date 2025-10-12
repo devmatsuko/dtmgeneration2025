@@ -42,6 +42,9 @@
 #define PULSE_WHITE_TIME      1     // 点滅回数
 #define PULSE_WHITE_SPACE     5     // 点滅間隔
 #define PULSE_WHITE_SPEED     1     // 点灯速度
+#define PULSE_WHITE_TIME2      2     // 点滅回数
+#define PULSE_WHITE_SPACE2     5     // 点滅間隔
+#define PULSE_WHITE_SPEED2     1     // 点灯
 
 // ランダム点灯
 #define RANDOM_ALL_WAIT       1000  // 1回目の待ち時間
@@ -62,6 +65,8 @@
 // じわじわ光る（消えない）
 #define PULSE_HOLD_WAIT       0     // 開始待ち時間
 #define PULSE_HOLD_WAIT2      1000  // 部位間待ち時間
+#define PULSE_HOLD_WAIT3      23000  // 開始待ち時間2
+#define PULSE_HOLD_WAIT4      7000  // 開始待ち時間2
 #define PULSE_HOLD_TIME       1     // 点滅回数
 #define PULSE_HOLD_SPACE      5     // 点滅間隔
 #define PULSE_HOLD_SPEED      3     // 点灯速度
@@ -80,14 +85,14 @@
 
 //左腕のひかり
 #define SET_LEFTARM_WAIT_START 4000//点灯待ち時間
-#define SET_LEFTARM_WAIT_END 1000//消灯待ち時間
+#define SET_LEFTARM_WAIT_END 900//消灯待ち時間
 
 //みぎ足のひかり
 #define SET_RIGHTLEG_WAIT_START 1000//点灯待ち時間
-#define SET_RIGHTLEG_WAIT_END 1000//消灯待ち時間
+#define SET_RIGHTLEG_WAIT_END 600//消灯待ち時間
 
 //LED の移動
-#define LEDMOVE_WAIT 3300//待ち時間
+#define LEDMOVE_WAIT 3800//待ち時間
 #define LED_MOVE_NUM 5    // 移動個数
 #define LED_MOVE_COLOR armLeft.Color(0, 0, 0, 255)//色
 #define LED_MOVE_SPEED      10    // 点灯速度
@@ -98,11 +103,16 @@
 
 
 //カラーチェンジ
-#define LED_WHITE_TO_RED_WAIT    2000   // 白⇒赤の待ち時間
-#define LED_REDE_TO_WHITE_WAIT    2000   // 赤⇒白の待ち時間
+#define LED_WHITE_TO_RED_WAIT    1000   // 白⇒赤の待ち時間
+#define LED_REDE_TO_WHITE_WAIT    1000   // 赤⇒白の待ち時間
 #define LED_CHANGECOLOR armLeft.Color(255, 0, 55, 0)//色
-#define LEDcolorchangeDISK_WAIT 5000//待ち時間
-#define LED_CHANGE_SPEED      20    // 点灯速度
+#define LEDcolorchangeDISK_WAIT 5700//待ち時間
+#define LED_CHANGE_SPEED      10    // 点灯速度
+
+//アピール全身ピンク
+#define LED_PINK_COLOR armLeft.Color(255, 0, 55, 0)//色
+#define LED_PINK_WAIT    6500   // 点灯までの時間
+#define LED_PINK_WAIT2   3000   // 消灯までの時間
 
 
 //(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
@@ -224,23 +234,31 @@ void performMainSequence() {
    set_rightleg_Color(getWhiteColor());
    delay(SET_RIGHTLEG_WAIT_END);
    setAllColor(0);
-   
+
    //LED移動
   delay(LEDMOVE_WAIT);
   LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
     
-  delay(LEDcolorchangeDISK_WAIT);
-  LEDcolorchangeDISK(getWhiteColor(),LED_CHANGE_SPEED, ARM_LEFT_LED, 
-              LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
-              
+       //じわじわ全身
+    delay(PULSE_HOLD_WAIT3);
+     pulseWhiteAll(PULSE_WHITE_TIME2, PULSE_WHITE_SPACE2, PULSE_WHITE_SPEED2); 
+
+   //カラチェン用 
+   delay(LEDcolorchangeDISK_WAIT);
+   LEDcolorchangeDISK(getWhiteColor(),LED_CHANGE_SPEED, ARM_LEFT_LED,LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
+   
+   //アピール全身ピンク
+   delay(LED_PINK_WAIT);
+   setAllColor(LED_PINK_COLOR);    
+   delay(LED_PINK_WAIT2);
+   setAllColor(0);    
   delay(10000000);
 }
 
 void performDebugSequence() {
 
- delay(LEDMOVE_WAIT);
- LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
-        
+   //delay(LEDcolorchangeDISK_WAIT);
+  pulseWhiteAll(PULSE_WHITE_TIME2, PULSE_WHITE_SPACE2, PULSE_WHITE_SPEED2);    
   delay(10000000);
 }
 
@@ -334,7 +352,26 @@ void setlegLeftColor_sune(uint32_t color) {
   setStripColor(&legLeft, color, 11, legLeft.numPixels());
 }
 
+
 // ==================== パルス効果 ====================
+void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
+  for (uint16_t k = 0; k < time; k++) {
+    for (int j = 0; j < 256; j += speed) {
+      uint8_t val = pgm_read_byte(&neopix_gamma[j]);
+      setAllColor(armLeft.Color(0, 0, 0, val));
+      delay(wait);
+    }
+    for (int j = 255; j >= 0; j -= 4) {
+            uint8_t val = pgm_read_byte(&neopix_gamma[j]);
+      setAllColor(armLeft.Color(0, 0, 0, val));
+      delay(wait);
+    }
+    delay(100);
+  }
+}
+
+
+
 void pulseEffect(void (*setColorFunc1)(uint32_t), void (*setColorFunc2)(uint32_t), 
                  uint16_t time, uint8_t wait, uint8_t speed, bool fadeOut) {
   for (uint16_t k = 0; k < time; k++) {
