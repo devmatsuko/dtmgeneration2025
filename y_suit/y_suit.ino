@@ -48,16 +48,17 @@
 
 // ランダム点灯
 #define RANDOM_ALL_WAIT       1000  // 1回目の待ち時間
-//#define RANDOM_ALL_WAIT2      16000 // 2回目の待ち時間  
+#define RANDOM_ALL_WAIT2      14000 // 2回目の待ち時間  
 #define RANDOM_ALL_TIME       25    // 点灯回数
+#define RANDOM_ALL_TIME2       25    // 点灯回数
 #define RANDOM_ALL_SPACE      50    // 点灯間隔
 #define RANDOM_ALL_NUM        5     // 同時点灯個数
 
-// 下から上への点灯
+// 下から上への消灯
 #define WAVE_FOOT_WAIT        500   // 開始待ち時間
 #define WAVE_TIME             10    // 点灯間隔
 #define WAVE_TIME2             10    // 点灯間隔
-#define WAVE_WAIT2      15500 // 2回目の待ち時間  
+#define WAVE_WAIT2     500 // 2回目の待ち時間  
 
 // 衣装切り替え
 #define SUITS_CHANGE_WAIT     6500  // 開始待ち時間
@@ -194,8 +195,15 @@ void performMainSequence() {
   colorWipeRange_wave_foot(getWhiteColor(), WAVE_TIME);
   colorWipeRange_wave_bodyarm(getWhiteColor(), WAVE_TIME);
 
+  //  ランダム点灯（2回目）
+  delay(RANDOM_ALL_WAIT2);
+  setAllColor(0);
+  random_all(getWhiteColor(), RANDOM_ALL_TIME2, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+  setAllColor(getWhiteColor());
+
   // 4. ロックマンLED移動
    delay(WAVE_WAIT2);
+   setAllColor(getWhiteColor());
    colorWipeRange_wave_foot_off(WAVE_TIME2) ;
    colorWipeRange_wave_bodyarm_off(WAVE_TIME2);
 
