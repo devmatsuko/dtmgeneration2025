@@ -48,7 +48,7 @@
 
 // ランダム点灯
 #define RANDOM_ALL_WAIT       1000  // 1回目の待ち時間
-#define RANDOM_ALL_WAIT2      14000 // 2回目の待ち時間  
+//#define RANDOM_ALL_WAIT2      16000 // 2回目の待ち時間  
 #define RANDOM_ALL_TIME       25    // 点灯回数
 #define RANDOM_ALL_SPACE      50    // 点灯間隔
 #define RANDOM_ALL_NUM        5     // 同時点灯個数
@@ -56,9 +56,11 @@
 // 下から上への点灯
 #define WAVE_FOOT_WAIT        500   // 開始待ち時間
 #define WAVE_TIME             10    // 点灯間隔
+#define WAVE_TIME2             10    // 点灯間隔
+#define WAVE_WAIT2      15500 // 2回目の待ち時間  
 
 // 衣装切り替え
-#define SUITS_CHANGE_WAIT     8000  // 開始待ち時間
+#define SUITS_CHANGE_WAIT     6500  // 開始待ち時間
 #define SUITS_CHANGE_TIME     2     // 切替回数
 #define SUITS_CHANGE_SPACE    2000  // 切替間隔
 
@@ -192,11 +194,10 @@ void performMainSequence() {
   colorWipeRange_wave_foot(getWhiteColor(), WAVE_TIME);
   colorWipeRange_wave_bodyarm(getWhiteColor(), WAVE_TIME);
 
-  // 4. ランダム点灯（2回目）
-  delay(RANDOM_ALL_WAIT2);
-  setAllColor(0);
-  random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
-  setAllColor(0);
+  // 4. ロックマンLED移動
+   delay(WAVE_WAIT2);
+   colorWipeRange_wave_foot_off(WAVE_TIME2) ;
+   colorWipeRange_wave_bodyarm_off(WAVE_TIME2);
 
   // 5. 衣装切り替え
   delay(SUITS_CHANGE_WAIT);
@@ -257,8 +258,18 @@ void performMainSequence() {
 
 void performDebugSequence() {
 
-   //delay(LEDcolorchangeDISK_WAIT);
-  pulseWhiteAll(PULSE_WHITE_TIME2, PULSE_WHITE_SPACE2, PULSE_WHITE_SPEED2);    
+   //アピール全身ピンク
+   delay(LED_PINK_WAIT);
+   setAllColor(LED_PINK_COLOR);    
+   delay(LED_PINK_WAIT2);
+   colorWipeRange_wave_foot_off(WAVE_TIME2) ;
+   colorWipeRange_wave_bodyarm_off(WAVE_TIME2);
+
+   delay(LED_PINK_WAIT);
+   colorWipeRange_wave_bodyarm2(getWhiteColor(), WAVE_TIME2);
+   colorWipeRange_wave_foot2(getWhiteColor(), WAVE_TIME2) ;
+   
+       
   delay(10000000);
 }
 
@@ -477,7 +488,7 @@ void setRandomPixels(Adafruit_NeoPixel* strip, uint32_t pos, uint8_t num, uint32
   strip->show();
 }
 
-// ==================== ウェーブ効果 ====================
+// ==================== ウェーブ効果 下から上点灯====================
 void colorWipeRange_wave_foot(uint32_t c, uint32_t wait) {
   for (uint16_t i = LEG_RIGHT_LED; i > 0; i--) {
     legRight.setPixelColor(i, c);
@@ -492,6 +503,83 @@ void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
   uint32_t g = ARM_LEFT_LED / 2;
   
   for (uint16_t i = ARM_LEFT_LED; i > 0; i--) {
+    // ボディー部分
+    bodyLeft.setPixelColor(i, c);
+    bodyRight.setPixelColor(i, c);
+    bodyLeft.show();
+    bodyRight.show();
+    delay(wait);
+    
+    // アーム部分
+    if (i >= ARM_LEFT_LED / 2) {
+      uint16_t armPos = i - (ARM_LEFT_LED / 2 + 1);
+      armLeft.setPixelColor(armPos, c);
+      armRight.setPixelColor(armPos, c);
+      armLeft.setPixelColor(g, c);
+      armRight.setPixelColor(g, c);
+      armLeft.show();
+      armRight.show();
+      g++;
+      delay(wait);
+    }
+  }
+}
+
+// ==================== ウェーブ効果 下から上　消灯====================
+void colorWipeRange_wave_foot_off(uint32_t wait) {
+  for (int16_t i = LEG_RIGHT_LED; i >= 0; i--) {
+    uint32_t c;
+    c=armLeft.Color(0, 0, 0, 0);
+    legRight.setPixelColor(i, c);
+    legLeft.setPixelColor(i, c);
+    legRight.show();
+    legLeft.show();
+    delay(wait);
+  }
+}
+
+void colorWipeRange_wave_bodyarm_off(uint32_t wait) {
+  uint32_t g = ARM_LEFT_LED / 2;
+  uint32_t c;
+  c=armLeft.Color(0, 0, 0, 0);
+  for (int16_t i = ARM_LEFT_LED; i >= 0; i--) {
+    // ボディー部分
+    bodyLeft.setPixelColor(i, c);
+    bodyRight.setPixelColor(i, c);
+    bodyLeft.show();
+    bodyRight.show();
+    delay(wait);
+    
+    // アーム部分
+    if (i >= ARM_LEFT_LED / 2) {
+      uint16_t armPos = i - (ARM_LEFT_LED / 2 + 1);
+      armLeft.setPixelColor(armPos, c);
+      armRight.setPixelColor(armPos, c);
+      armLeft.setPixelColor(g, c);
+      armRight.setPixelColor(g, c);
+      armLeft.show();
+      armRight.show();
+      g++;
+      delay(wait);
+    }
+  }
+}
+
+// ==================== ウェーブ効果 上から下点灯　小松用====================
+void colorWipeRange_wave_foot2(uint32_t c, uint32_t wait) {
+  for (uint16_t i = 0; i < LEG_RIGHT_LED; i++) {
+    legRight.setPixelColor(i, c);
+    legLeft.setPixelColor(i, c);
+    legRight.show();
+    legLeft.show();
+    delay(wait);
+  }
+}
+
+void colorWipeRange_wave_bodyarm2(uint32_t c, uint32_t wait) {
+  uint32_t g = ARM_LEFT_LED / 2;
+  
+  for (uint16_t i = 0; i < ARM_LEFT_LED; i++) {
     // ボディー部分
     bodyLeft.setPixelColor(i, c);
     bodyRight.setPixelColor(i, c);
