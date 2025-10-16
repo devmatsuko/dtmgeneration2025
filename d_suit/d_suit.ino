@@ -74,15 +74,15 @@ void loop() {
   // ｼﾞｬﾝ（右半身だけ点灯）
   setPartsColor(armLeft.Color(0, 0, 0, 255), RIGHT_SIDE, 3);
   delay(500);
-  // 全身白（一瞬）
-  setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  
-  // ｼﾞｬﾝ（下から上へ消える）
-  fadeInAllPartsOrder(armLeft.Color(0, 0, 0, 0), true, 3);
-  // ｼﾞｬﾝ（上から下へ点灯）
-  fadeInAllPartsOrder(armLeft.Color(0, 0, 0, 255), false, 3);
-  setAllColor(armLeft.Color(0, 0, 0, 255)); 
+  setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
+  // ｼﾞｬﾝ（左半身だけ点灯）
+  setPartsColor(armLeft.Color(0, 0, 0, 255), LEFT_SIDE, 3);
   delay(500);
+  setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
+  // ｼﾞｬﾝ(右半身だけ点灯)
+  setPartsColor(armLeft.Color(0, 0, 0, 255), RIGHT_SIDE, 3);
+  delay(500);
+  setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
 
   // 3:41.953ちょっとスーツ暗転
   setAllColor(armLeft.Color(0, 0, 0, 0));
@@ -95,17 +95,17 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
 
   // サビ前（ポイでカウントダウン予定のとこ）：左右で違う部位がランダム点滅（部位単位で光る）
-  lightRandomPartBothSides(armLeft.Color(0, 0, 0, 255));
+  lightPartBothSides(armLeft.Color(0, 0, 0, 255), 0, 2);
+  delay(500);
+  setAllColor(armLeft.Color(0, 0, 0, 0)); 
+  lightPartBothSides(armLeft.Color(0, 0, 0, 255), 1, 1);
   delay(400);
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  lightRandomPartBothSides(armLeft.Color(0, 0, 0, 255));
-  delay(400);
+  lightPartBothSides(armLeft.Color(0, 0, 0, 255), 2, 0);
+  delay(500);
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  lightRandomPartBothSides(armLeft.Color(0, 0, 0, 255));
-  delay(400);
-  setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  lightRandomPartBothSides(armLeft.Color(0, 0, 0, 255));
-  delay(400);
+  lightPartBothSides(armLeft.Color(0, 0, 0, 255), 0, 2);
+  delay(500);
   
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(1400);
@@ -115,23 +115,23 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
   
   // サビ？スウィングパート：全身白のままor8拍ずつで色変えたり何かしら変化させる？（ポイ振ってる時横向いてるし、３人の時色変えるかもだから白のままでもいい気もする）
-  delay(5000);
+  delay(28335);
 
   // スウィングパート終わりのジャンジャンジャンジャーン：ポイに合わせて半身ずつ白点灯、一瞬点灯してF.O.
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  delay(1000);
+  //delay(1000);
   // ｼﾞｬﾝ(左半身だけ点灯)
   setPartsColor(armLeft.Color(0, 0, 0, 255), LEFT_SIDE, 3);
-  delay(500);
+  delay(450);
   setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
   // ｼﾞｬﾝ（右半身だけ点灯）
   setPartsColor(armLeft.Color(0, 0, 0, 255), RIGHT_SIDE, 3);
-  delay(500);
+  delay(450);
   // ｼﾞｬﾝ（全身白）
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  delay(500);
+  delay(450);
   // ジャーン（キラキラ）
-  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 60, 30);
+  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 23, 30);
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(2000);
    
@@ -140,7 +140,7 @@ void loop() {
   // ----- ポイパート終了後〜二人に光渡すまで start -----
   fadeInBrightness(5, 1);
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  delay(5000);
+  delay(1800);
 
   // 後ろ指差す&Yk登場時のテテテン！に合わせて下から部位ごと消灯
   // 両足
@@ -153,12 +153,12 @@ void loop() {
   turnOffPair(&armLeft, &armRight);
 
   // 二人が舞台上がるまで暗転
-  delay(5000);
+  delay(15000);
 
   // 二人が舞台に上がり始めるあたりでF.I.
-  fadeInBrightness(7, 1);
-  setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  delay(5000);
+  // fadeInBrightness(7, 1);
+  // setAllColor(armLeft.Color(0, 0, 0, 255)); 
+  // delay(5000);
 
   // 二人に光渡して以降レインボー(仮)
   rainbowCycleAll(5);
@@ -166,10 +166,10 @@ void loop() {
 
   // ----- 3人パート start -----
   // 一旦仮でエンドパート〜終わりまでレインボー
-  delay(5000);
+  delay(8000);
   // ----- 3人パート end -----
-
-  setAllColor(armLeft.Color(255, 0, 0, 0)); // 赤（動作確認用：終了）
+  setAllColor(armLeft.Color(0, 0, 0, 0)); 
+  //setAllColor(armLeft.Color(255, 0, 0, 0)); // 赤（動作確認用：終了）
   delay(3000);
 
 }
@@ -596,17 +596,11 @@ void fadeInColorAllPartsRandom(uint32_t color, Adafruit_NeoPixel* parts[], uint8
 }
 
 /**
- * 左右でランダムな部位を選んでLEDを全点灯
+ * 左右で部位を選んでLEDを全点灯
 
    @param color     色情報
  */
-void lightRandomPartBothSides(uint32_t color) {
-  const uint8_t LEFT_COUNT  = sizeof(LEFT_SIDE) / sizeof(LEFT_SIDE[0]);
-  const uint8_t RIGHT_COUNT = sizeof(RIGHT_SIDE) / sizeof(RIGHT_SIDE[0]);
-
-  // 左右ランダムに選択
-  uint8_t leftIndex  = random(LEFT_COUNT);
-  uint8_t rightIndex = random(RIGHT_COUNT);
+void lightPartBothSides(uint32_t color, uint8_t leftIndex, uint8_t rightIndex) {
 
   Adafruit_NeoPixel* leftPart  = LEFT_SIDE[leftIndex];
   Adafruit_NeoPixel* rightPart = RIGHT_SIDE[rightIndex];
