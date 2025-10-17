@@ -58,10 +58,7 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 0));
 
   // ----- ドクターパート start -----
-  // 3:26.817 幕開いて登場：ランダムキラキラ
-  // 全身ランダムチカチカ（色、間隔、回数、同時に点灯させるLED数）
-  //blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 78, 30);
-
+  // 3:26.817 幕開いて登場：1部位ずつ点灯
   Adafruit_NeoPixel* order[] = { 
     &armRight, &legLeft, &bodyRight, &armLeft, &legRight, &bodyLeft, 
     &armRight, &legLeft, &bodyRight, &armLeft, &legRight, &bodyLeft,
@@ -98,9 +95,9 @@ void loop() {
   delay(1809);
 
   // 3:43.762ポイの光がスーツに吸い込まれる：体の中央から全身に光がチャージ
-  fadeInColorAllPartsRandom(armLeft.Color(0, 0, 0, 255), ALL_PARTS, 3, 50, 3);
+  fadeInColorAllPartsRandom(armLeft.Color(0, 0, 0, 255), ALL_PARTS, 6, 40, 5);
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  delay(1500);
+  delay(1850);
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
 
   // サビ前（ポイでカウントダウン予定のとこ）：左右で違う部位がランダム点滅（部位単位で光る）
@@ -119,16 +116,16 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(1550);
 
-  // サビ入りのテテテン！のとこ：テテテン！に合わせて全身に光が灯る（↑の「左右で違う部位がランダム点滅の応用でできないかなぁ）
+  // サビ入りのテテテン！のとこ：テテテン！に合わせて全身に光が灯る
   lightAllPartsRandomSequence(armLeft.Color(0, 0, 0, 255), 250);
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
   
   // サビ？スウィングパート：全身白のままor8拍ずつで色変えたり何かしら変化させる？（ポイ振ってる時横向いてるし、３人の時色変えるかもだから白のままでもいい気もする）
-  delay(28335);
+  delay(27500);
 
   // スウィングパート終わりのジャンジャンジャンジャーン：ポイに合わせて半身ずつ白点灯、一瞬点灯してF.O.
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  //delay(1000);
+  delay(500);
   // ｼﾞｬﾝ(左半身だけ点灯)
   setPartsColor(armLeft.Color(0, 0, 0, 255), LEFT_SIDE, 3);
   delay(450);
@@ -140,7 +137,7 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
   delay(450);
   // ジャーン（キラキラ）
-  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 23, 50);
+  sparkleFullBody(50, armLeft.Color(0, 0, 0, 255), 44, 40);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(2000);
    
@@ -318,78 +315,54 @@ void blinkRandomByPart(uint32_t color, Adafruit_NeoPixel* part, uint16_t wait, u
 }
 
 /**
-   全身ランダムキラキラ
-   指定したnumLEDsの数だけランダムな位置で同時に光らせる
+  アピールキラキラ！
+  やってることは全身からランダムな個数LEDを選んで点灯！の繰り返し
 
-   @param color   色
-   @param wait    点滅間隔
-   @param times   点滅回数
-   @param numLEDs 同時に光らせるLED個数
+  numLEDs   1度に光らせるLED個数
+  color     色情報
+  flashes   光らせる回数
+  wait      光らせる感覚（小さい数値ほどキラキラが速くなる）
 */
-void blinkRandomWholeBody(uint32_t color, uint16_t wait, uint16_t times, uint8_t numLEDs) {
-  const uint8_t totalParts = 6; // strips 配列の要素数
-  Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
+void sparkleFullBody(int numLEDs, uint32_t color, int flashes, uint16_t wait) {
 
-  // 各部位の LED 総数を計算
-  uint16_t partSizes[totalParts];
-  uint16_t totalLEDs = 0;
-  for (uint8_t i = 0; i < totalParts; i++) {
-    partSizes[i] = strips[i]->numPixels();
-    totalLEDs += partSizes[i];
+  Adafruit_NeoPixel* allParts[] = { &armLeft, &armRight, &bodyLeft, &bodyRight, &legLeft, &legRight };
+
+  // LED総数をカウント
+  int totalLEDs = 0;
+  int offsets[6]; // 各パーツの開始インデックス
+  for (int i = 0; i < 6; i++) {
+    offsets[i] = totalLEDs;
+    totalLEDs += allParts[i]->numPixels();
   }
 
-  for (uint16_t t = 0; t < times; t++) {
-    // まず全消灯
-    for (uint8_t i = 0; i < totalParts; i++) {
-      strips[i]->clear();
-    }
+  // ランダム点灯
+  for (int f = 0; f < flashes; f++) {
+    // まず全クリア
+    for (int i = 0; i < 6; i++) allParts[i]->clear();
 
-    // numLEDs 個のランダムで異なるLEDを全身から選ぶ
-    uint16_t selected[numLEDs];
-    uint8_t count = 0;
-
-    while (count < numLEDs) {
-      uint16_t idx = random(totalLEDs); // 0～totalLEDs-1 の範囲
-      bool duplicate = false;
-      for (uint8_t j = 0; j < count; j++) {
-        if (selected[j] == idx) {
-          duplicate = true;
+    for (int n = 0; n < numLEDs; n++) {
+      int r = random(totalLEDs); // 0〜totalLEDs-1
+      // どのパーツに属するか判定
+      for (int p = 0; p < 6; p++) {
+        int start = offsets[p];
+        int end = start + allParts[p]->numPixels();
+        if (r >= start && r < end) {
+          int idx = r - start;
+          allParts[p]->setPixelColor(idx, color);
           break;
         }
       }
-      if (!duplicate) {
-        selected[count++] = idx;
-      }
     }
 
-    // 選ばれた全身LEDを点灯
-    for (uint8_t i = 0; i < numLEDs; i++) {
-      uint16_t idx = selected[i];
-      // idx がどの部位か判定
-      for (uint8_t p = 0; p < totalParts; p++) {
-        if (idx < partSizes[p]) {
-          strips[p]->setPixelColor(idx, color);
-          break;
-        } else {
-          idx -= partSizes[p];
-        }
-      }
-    }
-
-    // 点灯
-    for (uint8_t i = 0; i < totalParts; i++) {
-      strips[i]->show();
-    }
-
+    // 全パーツ更新
+    for (int i = 0; i < 6; i++) allParts[i]->show();
     delay(wait);
+  }
 
-    // 消灯
-    for (uint8_t i = 0; i < totalParts; i++) {
-      strips[i]->clear();
-      strips[i]->show();
-    }
-
-    delay(wait);
+  // 最後に全消灯
+  for (int i = 0; i < 6; i++) {
+    allParts[i]->clear();
+    allParts[i]->show();
   }
 }
 
@@ -474,6 +447,7 @@ void fadePairFromHead(Adafruit_NeoPixel* left, Adafruit_NeoPixel* right, uint32_
 
    @param color     色情報
    @param parts     じわじわ対象部位配列
+   @param partCount 配列要素数
    @param wait      じわじわ速度（小さいほど早く侵食）
    @param numAtOnce 一度に点灯させるLED数
  */
