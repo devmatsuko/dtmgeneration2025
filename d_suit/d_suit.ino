@@ -55,16 +55,25 @@ void loop() {
   //03:19.340でスーツ点灯
   setAllColor(armLeft.Color(0, 0, 255, 0)); // 緑（動作確認用：開始）
   delay(7477);
+  setAllColor(armLeft.Color(0, 0, 0, 0));
 
   // ----- ドクターパート start -----
   // 3:26.817 幕開いて登場：ランダムキラキラ
   // 全身ランダムチカチカ（色、間隔、回数、同時に点灯させるLED数）
-  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 78, 30);
+  //blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 78, 30);
+
+  Adafruit_NeoPixel* order[] = { 
+    &armRight, &legLeft, &bodyRight, &armLeft, &legRight, &bodyLeft, 
+    &armRight, &legLeft, &bodyRight, &armLeft, &legRight, &bodyLeft,
+    &armRight, &legLeft, &bodyRight, &armLeft,
+  };
+
+  lightPartsSequentially(order, 16, armLeft.Color(0, 0, 0, 255), 350, 100);
 
   // 3:34.830 3人で前に歩く：ゆっくりF.I.&F.O.で明滅（5回）
   // フェードイン点滅（点滅回数、変化の速さ、変化幅）←変化幅を大きくすると明滅が速くなるよ
   pulseWhiteAll(5, 1, 5);
-  delay(500);
+  delay(700);
 
   // 二人ハケる直前のｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝ！:前半ｼﾞｬﾝｼﾞｬﾝで左点灯右点灯、後半ｼﾞｬﾝｼﾞｬﾝ！で内から外、上から下
   // ｼﾞｬﾝ(左半身だけ点灯)
@@ -108,7 +117,7 @@ void loop() {
   delay(500);
   
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  delay(1400);
+  delay(1550);
 
   // サビ入りのテテテン！のとこ：テテテン！に合わせて全身に光が灯る（↑の「左右で違う部位がランダム点滅の応用でできないかなぁ）
   lightAllPartsRandomSequence(armLeft.Color(0, 0, 0, 255), 250);
@@ -131,7 +140,7 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
   delay(450);
   // ジャーン（キラキラ）
-  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 23, 30);
+  blinkRandomWholeBody(armLeft.Color(0, 0, 0, 255), 40, 23, 50);
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(2000);
    
@@ -383,88 +392,6 @@ void blinkRandomWholeBody(uint32_t color, uint16_t wait, uint16_t times, uint8_t
     delay(wait);
   }
 }
-
-void blinkRandomWholeBodyForDuration(uint32_t color, uint16_t wait, uint32_t durationMs, uint8_t numLEDs) {
-  const uint8_t totalParts = 6;
-  Adafruit_NeoPixel* strips[] = { &armLeft, &bodyLeft, &bodyRight, &armRight, &legRight, &legLeft };
-
-  uint16_t partSizes[totalParts];
-  uint16_t totalLEDs = 0;
-  for (uint8_t i = 0; i < totalParts; i++) {
-    partSizes[i] = strips[i]->numPixels();
-    totalLEDs += partSizes[i];
-  }
-
-  unsigned long startTime = millis();
-  unsigned long now = startTime;
-  bool ledOn = false;
-
-  while (now - startTime < durationMs) {
-    // ランダム選択と描画は点灯時のみ
-    if (!ledOn) {
-      // 全消灯
-      for (uint8_t i = 0; i < totalParts; i++) {
-        strips[i]->clear();
-      }
-
-      // numLEDs個のランダムLEDを選択
-      uint16_t selected[numLEDs];
-      uint8_t count = 0;
-      while (count < numLEDs) {
-        uint16_t idx = random(totalLEDs);
-        bool duplicate = false;
-        for (uint8_t j = 0; j < count; j++) {
-          if (selected[j] == idx) {
-            duplicate = true;
-            break;
-          }
-        }
-        if (!duplicate) {
-          selected[count++] = idx;
-        }
-      }
-
-      // 選ばれたLEDを点灯
-      for (uint8_t i = 0; i < numLEDs; i++) {
-        uint16_t idx = selected[i];
-        for (uint8_t p = 0; p < totalParts; p++) {
-          if (idx < partSizes[p]) {
-            strips[p]->setPixelColor(idx, color);
-            break;
-          } else {
-            idx -= partSizes[p];
-          }
-        }
-      }
-
-      for (uint8_t i = 0; i < totalParts; i++) strips[i]->show();
-    } else {
-      // 消灯表示
-      for (uint8_t i = 0; i < totalParts; i++) {
-        strips[i]->clear();
-        strips[i]->show();
-      }
-    }
-
-    ledOn = !ledOn; // 点灯⇔消灯を切り替える
-
-    // ループ開始時刻からwait経過するまで待機
-    unsigned long nextTarget = now + wait;
-    while (millis() < nextTarget) {
-      // ここでCPUは待機。無駄なdelay()誤差を防ぐ。
-    }
-
-    now = millis();
-  }
-
-  // 最後に全消灯
-  for (uint8_t i = 0; i < totalParts; i++) {
-    strips[i]->clear();
-    strips[i]->show();
-  }
-}
-
-
 
 uint32_t Wheel(byte WheelPos) {
   WheelPos = 255 - WheelPos;
@@ -737,5 +664,31 @@ void lightAllRandom(uint32_t color, Adafruit_NeoPixel* part, uint16_t wait) {
     part->setPixelColor(indices[k], color);
     part->show();
     delay(wait);  // 点灯間隔
+  }
+}
+
+// 登場するときエフェクト。partsの順序に従って1部位ずつ光らせる
+void lightPartsSequentially(Adafruit_NeoPixel* parts[], int numParts, uint32_t color, uint16_t onTime, uint16_t offTime) {
+  for (int p = 0; p < numParts; p++) {
+    Adafruit_NeoPixel* strip = parts[p];
+    int n = strip->numPixels();
+
+    // 全部消灯
+    for (int i = 0; i < n; i++) strip->setPixelColor(i, 0);
+    strip->show();
+
+    // 点灯
+    for (int i = 0; i < n; i++) {
+      strip->setPixelColor(i, color);
+    }
+    strip->show();
+
+    delay(onTime); // 点灯時間キープ
+
+    // 消灯
+    strip->clear();
+    strip->show();
+
+    delay(offTime); // 次の部位までの間隔
   }
 }
