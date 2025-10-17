@@ -34,6 +34,8 @@
 // モード設定 (1:本番モード 2:開発モード)
 #define MODE 1
 
+
+
 // ==================== タイミング設定 ====================
 // じわじわ光る（消える）
 #define PULSE_WHITE_WAIT      7500  // 開始待ち時間
@@ -195,7 +197,9 @@ void performMainSequence() {
    //LEDの移動
    delay(LEDMOVE_WAIT);
    LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
-    
+
+
+
 
   // 終了（無限待機）
   delay(10000000);
@@ -204,8 +208,27 @@ void performMainSequence() {
 // デバッグシーケンス
 void performDebugSequence() {
   // デバッグ用の処理をここに記述
- delay(LEDMOVE_WAIT);
- LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
+
+  setAllColor(armLeft.Color(0, 0, 255, 0));// デバッグ開始の合図
+  delay(5000);
+  setAllColor(0);
+  // 小松さん白パート（時間調整はしてないです。エフェクトを並べただけ）
+  // 2枚分裂で半身ずつ上下に光が移動（終端で消える）
+  relayFromBodyCenterBoth(getWhiteColor(), 15); // 第二引数小さいほど早くなる
+  delay(2000);
+
+  // 右手1枚出現時に右足点灯
+  setLegRightThigh(getWhiteColor());
+  delay(1000);
+  setAllColor(0);
+
+  // 1から5枚にするところで下から光が充填されていく
+  fillFromLegsToArms(getWhiteColor(), 50);
+  delay(2000);
+  setAllColor(0);
+
+  // アピール！きらきら〜☆
+  sparkleFullBody(50, getWhiteColor(), 100, 40);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
     
   delay(10000000);
 }
@@ -722,5 +745,212 @@ komatsu_move_Led=ARM_LEFT_LED;
              }
         }
    
+  }
+}
+
+
+// ---------- 白パート用関数 ----------
+// relayFromBodyCenterBoth()のヘルパー関数：指定位置に「5個の光の塊」を出す
+void drawSegment(Adafruit_NeoPixel* strip, int pos, int len, uint32_t color) {
+  strip->clear();
+  for (int i = 0; i < len; i++) {
+    int idx = pos + i;
+    if (idx >= 0 && idx < strip->numPixels()) {
+      strip->setPixelColor(idx, color);
+    }
+  }
+  strip->show();
+}
+
+/**
+  2枚出現時のエフェクト（体の中央から腕先、足先に光がリレー）
+
+  color   色情報
+  wait    小さい数値ほどリレースピード速くなる
+*/
+void relayFromBodyCenterBoth(uint32_t color, uint16_t wait) {
+
+  int numBodyL = bodyLeft.numPixels();
+  int numBodyR = bodyRight.numPixels();
+  int numArmL = armLeft.numPixels();
+  int numArmR = armRight.numPixels();
+  int numLegL = legLeft.numPixels();
+  int numLegR = legRight.numPixels();
+
+  int stepSize = 5;
+  int centerL = numBodyL / 2;
+  int centerR = numBodyR / 2;
+
+  // 上方向に必要な最大距離（body上半分 + arm）
+  int upSteps = (centerL + numArmL);
+  // 下方向に必要な最大距離（body下半分 + leg）
+  int downSteps = ((numBodyL - centerL) + numLegL);
+
+  int totalSteps = max(upSteps, downSteps) + stepSize;
+
+  // --- 上下同時にリレー ---
+  for (int t = 0; t < totalSteps; t++) {
+    // 全クリア
+    bodyLeft.clear(); bodyRight.clear();
+    armLeft.clear(); armRight.clear();
+    legLeft.clear(); legRight.clear();
+
+    // ===== 上方向（中央 → arm末端）=====
+    int upOffset = t;
+    int bodyUpPos = centerL - upOffset;  // body中央→先端へ
+    drawSegment(&bodyLeft, bodyUpPos, stepSize, color);
+    drawSegment(&bodyRight, centerR - upOffset, stepSize, color);
+
+    int armPos = upOffset - centerL;     // armへ移行
+    if (armPos >= 0) {
+      drawSegment(&armLeft, armPos, stepSize, color);
+      drawSegment(&armRight, armPos, stepSize, color);
+    }
+
+    // ===== 下方向（中央 → leg末端）=====
+    int downOffset = t;
+    int bodyDownPos = centerL + downOffset;  // body中央→末端へ
+    drawSegment(&bodyLeft, bodyDownPos, stepSize, color);
+    drawSegment(&bodyRight, centerR + downOffset, stepSize, color);
+
+    int legPos = downOffset - (numBodyL - centerL);
+    if (legPos >= 0) {
+      drawSegment(&legLeft, legPos, stepSize, color);
+      drawSegment(&legRight, legPos, stepSize, color);
+    }
+
+    // --- すべて同時に更新 ---
+    bodyLeft.show(); bodyRight.show();
+    armLeft.show(); armRight.show();
+    legLeft.show(); legRight.show();
+
+    delay(wait);
+  }
+}
+
+// --- fillFromLegsToArms()のヘルパー関数：末端から充填する関数 ---
+void fillFromEnd(Adafruit_NeoPixel* strip, int litLength, uint32_t color) {
+  strip->clear();
+  int n = strip->numPixels();
+  for (int i = 0; i < litLength && i < n; i++) {
+    int idx = n - 1 - i;  // 末端から点灯
+    strip->setPixelColor(idx, color);
+  }
+  strip->show();
+}
+
+// --- fillFromLegsToArms()のヘルパー関数：先端から充填する関数（腕専用）---
+void fillFromStart(Adafruit_NeoPixel* strip, int litLength, uint32_t color) {
+  strip->clear();
+  int n = strip->numPixels();
+  for (int i = 0; i < litLength && i < n; i++) {
+    int idx = i;  // 先端から点灯
+    strip->setPixelColor(idx, color);
+  }
+  strip->show();
+}
+
+/**
+  1→5枚時のエフェクト。足から上に向かって光が充填される
+
+  color   色情報
+  wait    小さい数値ほどリレースピード速くなる
+*/
+void fillFromLegsToArms(uint32_t color, uint16_t wait) {
+
+  int numLegL = legLeft.numPixels();
+  int numLegR = legRight.numPixels();
+  int numBodyL = bodyLeft.numPixels();
+  int numBodyR = bodyRight.numPixels();
+  int numArmL = armLeft.numPixels();
+  int numArmR = armRight.numPixels();
+
+  // 各パーツごとの全LED数
+  int totalLen = numLegL + numBodyL + numArmL;
+
+  // 充填進行
+  for (int step = 0; step <= totalLen; step++) {
+    // --- 左右同時に更新 ---
+    legLeft.clear(); legRight.clear();
+    bodyLeft.clear(); bodyRight.clear();
+    armLeft.clear(); armRight.clear();
+
+    if (step <= numLegL) {
+      // 足のみ点灯中
+      fillFromEnd(&legLeft, step, color);
+      fillFromEnd(&legRight, step, color);
+    } else if (step <= numLegL + numBodyL) {
+      // 足は全点灯、体の下から充填
+      fillFromEnd(&legLeft, numLegL, color);
+      fillFromEnd(&legRight, numLegR, color);
+
+      int bodyFill = step - numLegL;
+      fillFromEnd(&bodyLeft, bodyFill, color);
+      fillFromEnd(&bodyRight, bodyFill, color);
+    } else {
+      // 足・体は全点灯、腕の先端から充填（ここが変更点）
+      fillFromEnd(&legLeft, numLegL, color);
+      fillFromEnd(&legRight, numLegR, color);
+      fillFromEnd(&bodyLeft, numBodyL, color);
+      fillFromEnd(&bodyRight, numBodyR, color);
+
+      int armFill = step - (numLegL + numBodyL);
+      fillFromStart(&armLeft, armFill, color);  // ← 先端から点灯
+      fillFromStart(&armRight, armFill, color); // ← 先端から点灯
+    }
+
+    delay(wait);
+  }
+}
+
+/**
+  5枚アピールキラキラ！
+  やってることは全身からランダムな個数LEDを選んで点灯！の繰り返し
+
+  numLEDs   1度に光らせるLED個数
+  color     色情報
+  flashes   光らせる回数
+  wait      光らせる感覚（小さい数値ほどキラキラが速くなる）
+*/
+void sparkleFullBody(int numLEDs, uint32_t color, int flashes, uint16_t wait) {
+
+  Adafruit_NeoPixel* allParts[] = { &armLeft, &armRight, &bodyLeft, &bodyRight, &legLeft, &legRight };
+
+  // LED総数をカウント
+  int totalLEDs = 0;
+  int offsets[6]; // 各パーツの開始インデックス
+  for (int i = 0; i < 6; i++) {
+    offsets[i] = totalLEDs;
+    totalLEDs += allParts[i]->numPixels();
+  }
+
+  // ランダム点灯
+  for (int f = 0; f < flashes; f++) {
+    // まず全クリア
+    for (int i = 0; i < 6; i++) allParts[i]->clear();
+
+    for (int n = 0; n < numLEDs; n++) {
+      int r = random(totalLEDs); // 0〜totalLEDs-1
+      // どのパーツに属するか判定
+      for (int p = 0; p < 6; p++) {
+        int start = offsets[p];
+        int end = start + allParts[p]->numPixels();
+        if (r >= start && r < end) {
+          int idx = r - start;
+          allParts[p]->setPixelColor(idx, color);
+          break;
+        }
+      }
+    }
+
+    // 全パーツ更新
+    for (int i = 0; i < 6; i++) allParts[i]->show();
+    delay(wait);
+  }
+
+  // 最後に全消灯
+  for (int i = 0; i < 6; i++) {
+    allParts[i]->clear();
+    allParts[i]->show();
   }
 }
