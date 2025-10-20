@@ -54,14 +54,15 @@
 #define RANDOM_ALL_SPACE      50    // 点灯間隔
 #define RANDOM_ALL_NUM        5     // 同時点灯個数
 
-// 下から上への消灯
+// 下から上への点灯/消灯 ロックマン移動
 #define WAVE_FOOT_WAIT        500   // 開始待ち時間
-#define WAVE_TIME             10    // 点灯間隔
-#define WAVE_TIME2             10    // 点灯間隔
+#define WAVE_TIME             10    // 点灯間隔 　下から上の点灯
+#define WAVE_TIME2             1    // 点灯間隔　下から上の消灯
+#define WAVE_NUM            3    // 点灯間隔
 #define WAVE_WAIT2     500 // 2回目の待ち時間  
 
 // 衣装切り替え
-#define SUITS_CHANGE_WAIT     6500  // 開始待ち時間
+#define SUITS_CHANGE_WAIT     7100  // 開始待ち時間 +100
 #define SUITS_CHANGE_TIME     2     // 切替回数
 #define SUITS_CHANGE_SPACE    2000  // 切替間隔
 
@@ -91,11 +92,11 @@
 #define SET_LEFTARM_WAIT_END 900//消灯待ち時間
 
 //みぎ足のひかり
-#define SET_RIGHTLEG_WAIT_START 1000//点灯待ち時間
-#define SET_RIGHTLEG_WAIT_END 600//消灯待ち時間
+#define SET_RIGHTLEG_WAIT_START 1500//点灯待ち時間 +500
+#define SET_RIGHTLEG_WAIT_END 1300//消灯待ち時間+600
 
 //LED の移動
-#define LEDMOVE_WAIT 3800//待ち時間
+#define LEDMOVE_WAIT 2600// -1200
 #define LED_MOVE_NUM 5    // 移動個数
 #define LED_MOVE_COLOR armLeft.Color(0, 0, 0, 255)//色
 #define LED_MOVE_SPEED      10    // 点灯速度
@@ -104,6 +105,17 @@
 #define LEDMOVE_LEFT_START 0//左腕スタート地点
 #define LEDMOVE_LEFT_END 17//左腕地点エンド地点
 
+//アピール全身 白
+#define LED_WHITE_COLOR armLeft.Color(0, 0, 0, 255)//色
+#define LED_WHITE_WAIT    5700   // 点灯までの時間
+#define LED_WHITE_WAIT2   2300   // 消灯までの時間
+
+//カラーチェンジpart2
+#define LED_PART_PINK_COLOR armLeft.Color(255, 0, 55, 0)//ピンク色
+#define LED_PART_WHITE_COLOR armLeft.Color(0, 0, 0, 255)//白色
+#define LED_WHITE_PINK_WAIT   7500   // 点灯までの時間
+#define LED_WHITE_PINK_WAIT2   3000   // 点灯までの時間
+
 
 //カラーチェンジ
 #define LED_WHITE_TO_RED_WAIT    1000   // 白⇒赤の待ち時間
@@ -111,6 +123,7 @@
 #define LED_CHANGECOLOR armLeft.Color(255, 0, 55, 0)//色
 #define LEDcolorchangeDISK_WAIT 5700//待ち時間
 #define LED_CHANGE_SPEED      10    // 点灯速度
+
 
 //アピール全身ピンク
 #define LED_PINK_COLOR armLeft.Color(255, 0, 55, 0)//色
@@ -204,8 +217,8 @@ void performMainSequence() {
   // 4. ロックマンLED移動
    delay(WAVE_WAIT2);
    setAllColor(getWhiteColor());
-   colorWipeRange_wave_foot_off(WAVE_TIME2) ;
-   colorWipeRange_wave_bodyarm_off(WAVE_TIME2);
+   colorWipeRange_wave_foot_off(WAVE_TIME2,WAVE_NUM) ;
+   colorWipeRange_wave_bodyarm_off(WAVE_TIME2,WAVE_NUM);
 
   // 5. 衣装切り替え
   delay(SUITS_CHANGE_WAIT);
@@ -252,31 +265,34 @@ void performMainSequence() {
     delay(PULSE_HOLD_WAIT3);
      pulseWhiteAll(PULSE_WHITE_TIME2, PULSE_WHITE_SPACE2, PULSE_WHITE_SPEED2); 
 
-   //カラチェン用 
-   delay(LEDcolorchangeDISK_WAIT);
-   LEDcolorchangeDISK(getWhiteColor(),LED_CHANGE_SPEED, ARM_LEFT_LED,LED_CENTER_NUM_MOVE, 1, LED_CENTER_OFFSET,LED_WHITE_TO_RED_WAIT,LED_REDE_TO_WHITE_WAIT,LED_CHANGECOLOR);
-   
-   //アピール全身ピンク
-   delay(LED_PINK_WAIT);
-   setAllColor(LED_PINK_COLOR);    
-   delay(LED_PINK_WAIT2);
-   setAllColor(0);    
+  //アピール全身白
+   delay(LED_WHITE_WAIT);
+   setAllColor(LED_WHITE_COLOR);    
+   delay(LED_WHITE_WAIT2);
+   setAllColor(0);
+
+   delay(LED_WHITE_PINK_WAIT);
+   set_armleft_Color(LED_PART_PINK_COLOR);
+   set_armright_Color(LED_PART_WHITE_COLOR);
+   set_bodyLeft_Color(LED_PART_WHITE_COLOR);
+   set_bodyRight_Color(LED_PART_PINK_COLOR);
+   set_legRight_Color(LED_PART_PINK_COLOR);
+   set_legLeft_Color(LED_PART_WHITE_COLOR);
+   delay(LED_WHITE_PINK_WAIT2);
+   setAllColor(0);
+ 
   delay(10000000);
 }
 
 void performDebugSequence() {
 
-   //アピール全身ピンク
-   delay(LED_PINK_WAIT);
-   setAllColor(LED_PINK_COLOR);    
-   delay(LED_PINK_WAIT2);
-   colorWipeRange_wave_foot_off(WAVE_TIME2) ;
-   colorWipeRange_wave_bodyarm_off(WAVE_TIME2);
-
-   delay(LED_PINK_WAIT);
-   colorWipeRange_wave_bodyarm2(getWhiteColor(), WAVE_TIME2);
-   colorWipeRange_wave_foot2(getWhiteColor(), WAVE_TIME2) ;
-   
+ delay(LED_WHITE_PINK_WAIT);
+ set_armleft_Color(LED_PART_PINK_COLOR);
+ set_armright_Color(LED_PART_WHITE_COLOR);
+ set_bodyLeft_Color(LED_PART_PINK_COLOR);
+ set_bodyRight_Color(LED_PART_WHITE_COLOR);
+ set_legRight_Color(LED_PART_PINK_COLOR);
+ set_legLeft_Color(LED_PART_WHITE_COLOR);
        
   delay(10000000);
 }
@@ -310,6 +326,29 @@ void setAllColor(uint32_t color) {
   setStripColor(&legRight, color, 0, legRight.numPixels());
   setStripColor(&legLeft, color, 0, legLeft.numPixels());
 }
+
+void set_armleft_Color(uint32_t color) {
+  setStripColor(&armLeft, color, 0, armLeft.numPixels());
+}
+
+void set_armright_Color(uint32_t color) {
+  setStripColor(&armRight, color, 0, armRight.numPixels());
+}
+void set_bodyLeft_Color(uint32_t color) {
+   setStripColor(&bodyLeft, color, 0, bodyLeft.numPixels());
+}
+void set_bodyRight_Color(uint32_t color) {
+  setStripColor(&bodyRight, color, 0, bodyRight.numPixels());
+}
+void set_legRight_Color(uint32_t color) {
+    setStripColor(&legRight, color, 0, legRight.numPixels());
+}
+void set_legLeft_Color(uint32_t color) {
+     setStripColor(&legLeft, color, 0, legLeft.numPixels());
+}
+
+
+
 
 void setStripColor_body(Adafruit_NeoPixel* strip, uint32_t color, uint16_t start, uint16_t end) {
   for (uint16_t i = start; i < end; i++) {
@@ -534,7 +573,7 @@ void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
 }
 
 // ==================== ウェーブ効果 下から上　消灯====================
-void colorWipeRange_wave_foot_off(uint32_t wait) {
+void colorWipeRange_wave_foot_off(uint32_t wait,uint32_t off_num) {
   for (int16_t i = LEG_RIGHT_LED; i >= 0; i--) {
     uint32_t c;
     c=armLeft.Color(0, 0, 0, 0);
@@ -546,7 +585,7 @@ void colorWipeRange_wave_foot_off(uint32_t wait) {
   }
 }
 
-void colorWipeRange_wave_bodyarm_off(uint32_t wait) {
+void colorWipeRange_wave_bodyarm_off(uint32_t wait,uint32_t off_num) {
   uint32_t g = ARM_LEFT_LED / 2;
   uint32_t c;
   c=armLeft.Color(0, 0, 0, 0);
