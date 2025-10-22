@@ -16,79 +16,101 @@
 #define BRIGHTNESS 100
 
 // LED個数
-#define ARM_LEFT_LED   36
-#define BODY_LEFT_LED  27
+#define ARM_LEFT_LED 36
+#define BODY_LEFT_LED 27
 #define BODY_RIGHT_LED 27
-#define ARM_RIGHT_LED  36
-#define LEG_RIGHT_LED  21
-#define LEG_LEFT_LED   21
+#define ARM_RIGHT_LED 36
+#define LEG_RIGHT_LED 21
+#define LEG_LEFT_LED 21
 
 // ピン番号
-#define PIN_ARM_LEFT   3
-#define PIN_BODY_LEFT  4
+#define PIN_ARM_LEFT 3
+#define PIN_BODY_LEFT 4
 #define PIN_BODY_RIGHT 6
-#define PIN_ARM_RIGHT  7
-#define PIN_LEG_RIGHT  8
-#define PIN_LEG_LEFT   9
+#define PIN_ARM_RIGHT 7
+#define PIN_LEG_RIGHT 8
+#define PIN_LEG_LEFT 9
 
 // モード設定 (1:本番モード 2:開発モード)
 #define MODE 1
 
-
-
 // ==================== タイミング設定 ====================
 // じわじわ光る（消える）
-#define PULSE_WHITE_WAIT      7500  // 開始待ち時間
-#define PULSE_WHITE_WAIT2     1500  // 部位間待ち時間
-#define PULSE_WHITE_TIME      1     // 点滅回数
-#define PULSE_WHITE_SPACE     5     // 点滅間隔
-#define PULSE_WHITE_SPEED     1     // 点灯速度
+#define PULSE_WHITE_WAIT 7500   // 開始待ち時間
+#define PULSE_WHITE_WAIT2 1500  // 部位間待ち時間
+#define PULSE_WHITE_TIME 1      // 点滅回数
+#define PULSE_WHITE_SPACE 5     // 点滅間隔
+#define PULSE_WHITE_SPEED 1     // 点灯速度
 
 // ランダム点灯
-#define RANDOM_ALL_WAIT       1000  // 1回目の待ち時間
-#define RANDOM_ALL_TIME       25    // 点灯回数
-#define RANDOM_ALL_SPACE      50    // 点灯間隔
-#define RANDOM_ALL_NUM        5     // 同時点灯個数
+#define RANDOM_ALL_WAIT 1000  // 1回目の待ち時間
+#define RANDOM_ALL_TIME 25    // 点灯回数
+#define RANDOM_ALL_SPACE 50   // 点灯間隔
+#define RANDOM_ALL_NUM 5      // 同時点灯個数
 
-// 下から上への点灯
-#define WAVE_FOOT_WAIT        500   // 開始待ち時間
-#define WAVE_TIME             10    // 点灯間隔
-#define WAVE_FOOT_WAIT2       1000   // 開始待ち時間
+// 上から下　下から上
+#define WAVE_FOOT_WAIT 500    // 開始待ち時間
+#define WAVE_TIME 10          // 点灯間隔　下から上への点灯　確認用
+#define WAVE_TIME2 1          // 点灯間隔　上から下への点灯　ロックマン
+#define WAVE_FOOT_WAIT2 1000  // 開始待ち時間
 
-// 白点灯
-#define WHITE_ON_WAIT         15000  // 点灯時間
+// 白点灯 
+#define WHITE_ON_WAIT 16000  // 点灯時間　上から下　ロックマン待ち時間
 
 // 消灯
-#define WHITE_OFF_WAIT        7300   // 消灯時間
+#define WHITE_OFF_WAIT 6200  // 消灯時間
 
 // 衣装切り替え
-#define SUITS_CHANGE_WAIT     2300   // 開始待ち時間
+#define SUITS_CHANGE_WAIT     2300   // 開始待ち時間 この数字はいじっちゃだめ
 #define SUITS_CHANGE_TIME     1      // 切替回数
 #define SUITS_CHANGE_SPACE    2000   // 切替間隔
 
 // じわじわ光る（消えない）
-#define PULSE_HOLD_WAIT       0     // 開始待ち時間
-#define PULSE_HOLD_WAIT2      7250  // 部位間待ち時間
-#define PULSE_HOLD_TIME       1     // 点滅回数
-#define PULSE_HOLD_SPACE      5     // 点滅間隔
-#define PULSE_HOLD_SPEED      3     // 点灯速度
+#define PULSE_HOLD_WAIT 0      // 開始待ち時間
+#define PULSE_HOLD_WAIT2 7100  // 部位間待ち時間
+#define PULSE_HOLD_TIME 1      // 点滅回数
+#define PULSE_HOLD_SPACE 5     // 点滅間隔
+#define PULSE_HOLD_SPEED 3     // 点灯速度
 
 // 中央への集光　アーム
-#define LED_CENTER_WAIT       1500  // 開始待ち時間
-#define LED_CENTER_SPEED      20    // 点灯速度 
-#define LED_CENTER_NUM_MOVE   5     // 移動個数
-#define LED_CENTER_TIME       3     // 繰り返し回数
-#define LED_CENTER_OFFSET     2     // 位置調整
+#define LED_CENTER_WAIT 1500   // 開始待ち時間
+#define LED_CENTER_SPEED 20    // 点灯速度
+#define LED_CENTER_NUM_MOVE 5  // 移動個数
+#define LED_CENTER_TIME 3      // 繰り返し回数
+#define LED_CENTER_OFFSET 2    // 位置調整
 
 //LED の移動
-#define LEDMOVE_WAIT 18700//待ち時間
-#define LED_MOVE_NUM 5    // 移動個数
-#define LED_MOVE_COLOR armLeft.Color(0, 0, 0, 255)//色
-#define LED_MOVE_SPEED  10 // 点灯速度 20
-#define LEDMOVE_RIGHT_START 17//右腕スタート地点
-#define LEDMOVE_RIGHT_END 0//右腕地点エンド地点
-#define LEDMOVE_LEFT_START 0//左腕スタート地点
-#define LEDMOVE_LEFT_END 17//左腕地点エンド地点
+#define LEDMOVE_WAIT 18700                          //待ち時間
+#define LED_MOVE_NUM 5                              // 移動個数
+#define LED_MOVE_COLOR armLeft.Color(0, 0, 0, 255)  //色
+#define LED_MOVE_SPEED 10                           // 点灯速度 20
+#define LEDMOVE_RIGHT_START 17                      //右腕スタート地点
+#define LEDMOVE_RIGHT_END 0                         //右腕地点エンド地点
+#define LEDMOVE_LEFT_START 0                        //左腕スタート地点
+#define LEDMOVE_LEFT_END 17                         //左腕地点エンド地点
+
+//飛行パート　
+  // 小松さん白パート（時間調整はしてないです。エフェクトを並べただけ）
+  // 2枚分裂で半身ずつ上下に光が移動（終端で消える）1:40
+#define DISK_MOVE_WAIT0 4500                         //待ち時間
+
+#define DISK_MOVE_SPACE1 15                         // 点灯間隔
+#define DISK_MOVE_WAIT 9500                         //待ち時間
+
+ // 右手1枚出現時に右足点灯 1:44
+#define DISK_MOVE_WAIT2 1000                        // 次の光の待ち時間
+
+  // 1から5枚にするところで下から光が充填されていく1:52
+#define DISK_MOVE_SPACE2 50                          // 点灯間隔 // 点灯間隔
+#define DISK_MOVE_WAIT3 2000                        // 次の光の待ち時間
+
+  // アピール！きらきら〜☆1:54
+#define DISK_MOVE_NUM 50                          // 点灯個数
+#define DISK_MOVE_FLASH 100                        // 光
+#define DISK_MOVE_SPACE3 40                        // 点灯間隔
+
+
+
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -101,22 +123,22 @@ Adafruit_NeoPixel legLeft(LEG_LEFT_LED, PIN_LEG_LEFT, NEO_GRBW + NEO_KHZ800);
 
 // ガンマ補正テーブル（メモリ節約のためPROGMEMに格納）
 const byte neopix_gamma[] PROGMEM = {
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
-    1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
-    2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
-    5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
-   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
-   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
-   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
-   37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
-   51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
-   69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
-   90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,
-  115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
-  144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
-  177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
-  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2,
+  2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5,
+  5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10,
+  10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
+  17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
+  25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
+  37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
+  51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
+  69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
+  90, 92, 93, 95, 96, 98, 99, 101, 102, 104, 105, 107, 109, 110, 112, 114,
+  115, 117, 119, 120, 122, 124, 126, 127, 129, 131, 133, 135, 137, 138, 140, 142,
+  144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 167, 169, 171, 173, 175,
+  177, 180, 182, 184, 186, 189, 191, 193, 196, 198, 200, 203, 205, 208, 210, 213,
+  215, 218, 220, 223, 225, 228, 231, 233, 236, 239, 241, 244, 247, 249, 252, 255
 };
 
 // ==================== 初期設定 ====================
@@ -149,7 +171,7 @@ void loop() {
 // ==================== シーケンス制御 ====================
 // メインシーケンス
 void performMainSequence() {
-    // 1. じわじわ光る（脛→もも→腰→アーム）消える
+  // 1. じわじわ光る（脛→もも→腰→アーム）消える
   delay(PULSE_WHITE_WAIT);
   pulseWhite_series_sune(PULSE_WHITE_TIME, PULSE_WHITE_SPACE, PULSE_WHITE_SPEED);
   delay(PULSE_WHITE_WAIT2);
@@ -170,35 +192,54 @@ void performMainSequence() {
   delay(WAVE_FOOT_WAIT2);
   setAllColor(0);
 
-  // 1. 白色で全点灯
+  // 1. 上から下の点灯出現 六万
   delay(WHITE_ON_WAIT);
-  setAllColor(getWhiteColor());
- 
-  
+  colorWipeRange_wave_bodyarm2(getWhiteColor(), WAVE_TIME2);
+  colorWipeRange_wave_foot2(getWhiteColor(), WAVE_TIME2);
+
   // 2. 消灯
   delay(WHITE_OFF_WAIT);
   setAllColor(0);
-  
+
   // 3. 衣装切り替えエフェクト
   delay(SUITS_CHANGE_WAIT);
   suitsLedChange(getWhiteColor(), 0, SUITS_CHANGE_TIME, SUITS_CHANGE_SPACE);
-  
+
   // 6. じわじわ光る（脛→もも→腰→アーム）消えない
-   delay(PULSE_HOLD_WAIT2);
-   pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
+  delay(PULSE_HOLD_WAIT2);
+  pulseWhite_arm_hold(PULSE_HOLD_TIME, PULSE_HOLD_SPACE, PULSE_HOLD_SPEED);
 
-      // 4. 中央への集光　アーム
-   delay(LED_CENTER_WAIT);
-   setAllColor(0);
-   LEDtoCenter_arm(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED, 
-              LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
-   setAllColor(0);
+  // 4. 中央への集光　アーム
+  delay(LED_CENTER_WAIT);
+  setAllColor(0);
+  LEDtoCenter_arm(getWhiteColor(), LED_CENTER_SPEED, ARM_LEFT_LED,
+                  LED_CENTER_NUM_MOVE, LED_CENTER_TIME, LED_CENTER_OFFSET);
+  setAllColor(0);
 
-   //LEDの移動
-   delay(LEDMOVE_WAIT);
-   LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
+  //LEDの移動
+  delay(LEDMOVE_WAIT);
+  LEDMOVE(LED_MOVE_COLOR, LED_MOVE_SPEED, LEDMOVE_RIGHT_START, LEDMOVE_RIGHT_END, LEDMOVE_LEFT_END, LEDMOVE_LEFT_START, LEDMOVE_LEFT_END, LED_MOVE_NUM);
 
+ //小松飛行パート
+  delay(DISK_MOVE_WAIT0);
 
+  // 小松さん白パート（時間調整はしてないです。エフェクトを並べただけ）
+  // 2枚分裂で半身ずつ上下に光が移動（終端で消える）
+  relayFromBodyCenterBoth(getWhiteColor(), DISK_MOVE_SPACE1); // 第二引数小さいほど早くなる DISK_MOVE_SPACE1 15
+  delay(DISK_MOVE_WAIT);//DISK_MOVE_WAIT 2000
+
+  // // 右手1枚出現時に右足点灯
+  // setLegRightThigh(getWhiteColor());
+  // delay(DISK_MOVE_WAIT2);//DISK_MOVE_WAIT2 1000
+  // setAllColor(0);
+
+  // // 1から5枚にするところで下から光が充填されていく
+  // fillFromLegsToArms(getWhiteColor(), DISK_MOVE_SPACE2);//DISK_MOVE_SPACE2 50
+  // delay(DISK_MOVE_WAIT3);//DISK_MOVE_WAIT3 2000
+  // setAllColor(0);
+
+  // アピール！きらきら〜☆
+  sparkleFullBody(DISK_MOVE_NUM, getWhiteColor(), DISK_MOVE_FLASH, DISK_MOVE_SPACE3);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
 
 
   // 終了（無限待機）
@@ -208,28 +249,27 @@ void performMainSequence() {
 // デバッグシーケンス
 void performDebugSequence() {
   // デバッグ用の処理をここに記述
+  delay(DISK_MOVE_WAIT0);
 
-  setAllColor(armLeft.Color(0, 0, 255, 0));// デバッグ開始の合図
-  delay(5000);
-  setAllColor(0);
   // 小松さん白パート（時間調整はしてないです。エフェクトを並べただけ）
   // 2枚分裂で半身ずつ上下に光が移動（終端で消える）
-  relayFromBodyCenterBoth(getWhiteColor(), 15); // 第二引数小さいほど早くなる
-  delay(2000);
+  relayFromBodyCenterBoth(getWhiteColor(), DISK_MOVE_SPACE1); // 第二引数小さいほど早くなる DISK_MOVE_SPACE1 15
+  delay(DISK_MOVE_WAIT);//DISK_MOVE_WAIT 2000
 
   // 右手1枚出現時に右足点灯
   setLegRightThigh(getWhiteColor());
-  delay(1000);
+  delay(DISK_MOVE_WAIT2);//DISK_MOVE_WAIT2 1000
   setAllColor(0);
 
   // 1から5枚にするところで下から光が充填されていく
-  fillFromLegsToArms(getWhiteColor(), 50);
-  delay(2000);
+  fillFromLegsToArms(getWhiteColor(), DISK_MOVE_SPACE2);//DISK_MOVE_SPACE2 50
+  delay(DISK_MOVE_WAIT3);//DISK_MOVE_WAIT3 2000
   setAllColor(0);
 
   // アピール！きらきら〜☆
-  sparkleFullBody(50, getWhiteColor(), 100, 40);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
-    
+  sparkleFullBody(DISK_MOVE_NUM, getWhiteColor(), DISK_MOVE_FLASH, DISK_MOVE_SPACE3);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
+
+
   delay(10000000);
 }
 
@@ -424,7 +464,7 @@ void random_all(uint32_t c, uint16_t time, uint8_t wait, uint8_t num) {
     positions[3] = random(0, ARM_RIGHT_LED);
     positions[4] = random(0, LEG_RIGHT_LED);
     positions[5] = random(0, LEG_LEFT_LED);
-    
+
     // 点灯
     setRandomPixels(&armLeft, positions[0], num, c);
     setRandomPixels(&bodyLeft, positions[1], num, c);
@@ -432,9 +472,9 @@ void random_all(uint32_t c, uint16_t time, uint8_t wait, uint8_t num) {
     setRandomPixels(&armRight, positions[3], num, c);
     setRandomPixels(&legRight, positions[4], num, c);
     setRandomPixels(&legLeft, positions[5], num, c);
-    
+
     delay(wait);
-    
+
     // 消灯
     setRandomPixels(&armLeft, positions[0], num, 0);
     setRandomPixels(&bodyLeft, positions[1], num, 0);
@@ -450,7 +490,7 @@ void suitsLedChange(uint32_t colorOn, uint32_t colorOff, uint32_t time, uint32_t
     // 点灯
     setAllColor(colorOn);
     delay(wait);
-    
+
     // 消灯
     setAllColor(colorOff);
     delay(wait);
@@ -485,7 +525,7 @@ void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
 }
 
 // パルスエフェクト共通処理
-void pulseEffect(void (*setColorFunc1)(uint32_t), void (*setColorFunc2)(uint32_t),uint16_t time, uint8_t wait, uint8_t speed, bool fadeOut) {
+void pulseEffect(void (*setColorFunc1)(uint32_t), void (*setColorFunc2)(uint32_t), uint16_t time, uint8_t wait, uint8_t speed, bool fadeOut) {
   for (uint16_t k = 0; k < time; k++) {
     // フェードイン
     for (int j = 0; j < 256; j += speed) {
@@ -548,7 +588,7 @@ void pulseWhiteArmHold(uint16_t time, uint8_t wait, uint8_t speed) {
 // ==================== レインボーエフェクト ====================
 void rainbowCycleAll(uint8_t wait) {
   uint16_t maxPixels = max(max(max(ARM_LEFT_LED, BODY_LEFT_LED), ARM_RIGHT_LED), LEG_RIGHT_LED);
-  
+
   for (uint16_t j = 0; j < 256 * 5; j++) {
     setRainbowStrip(&armLeft, j, maxPixels);
     setRainbowStrip(&bodyLeft, j, maxPixels);
@@ -592,13 +632,13 @@ void showAllStrips() {
 }
 
 // ==================== 中央への集光 ====================
-void LEDtoCenter_arm(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove, 
-                 uint8_t time, uint8_t offset) {
+void LEDtoCenter_arm(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,
+                     uint8_t time, uint8_t offset) {
   for (uint16_t t = 0; t < time; t++) {
     uint8_t i = 0;
     uint8_t g = 0;
     uint8_t u = LEG_RIGHT_LED;
-    
+
     for (uint16_t k = num; k > 0; k--) {
       // // ボディー上から下
       // if (i < (BODY_LEFT_LED / 2) - numMove - offset) {
@@ -608,7 +648,7 @@ void LEDtoCenter_arm(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,
       //   bodyRight.show();
       //   i++;
       // }
-      
+
       // // ボディー下から上
       // if (k >= (BODY_LEFT_LED / 2) - numMove - offset) {
       //   bodyLeft.setPixelColor(k, c);
@@ -616,7 +656,7 @@ void LEDtoCenter_arm(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,
       //   bodyLeft.show();
       //   bodyRight.show();
       // }
-      
+
       // アーム下から上
       if (k >= ARM_LEFT_LED / 2) {
         uint16_t armPos = k - (ARM_LEFT_LED + 2) / 2;
@@ -625,7 +665,7 @@ void LEDtoCenter_arm(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,
         armLeft.show();
         armRight.show();
       }
-      
+
       // // 足下から上
       // if (u <= k) {
       //   legRight.setPixelColor(u, c);
@@ -634,7 +674,7 @@ void LEDtoCenter_arm(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,
       //   legLeft.show();
       //   u--;
       // }
-      
+
       // 前のLEDを消灯
       clearPreviousLEDs(k, g, numMove);
       delay(wait);
@@ -652,7 +692,7 @@ void clearPreviousLEDs(uint16_t k, uint8_t g, uint8_t numMove) {
   armRight.setPixelColor(k - numMove - (19 - numMove * 2), 0);
   legRight.setPixelColor(k - numMove - (15 - numMove * 2), 0);
   legLeft.setPixelColor(k - numMove - (15 - numMove * 2), 0);
-  
+
   armLeft.show();
   bodyLeft.show();
   bodyRight.show();
@@ -674,7 +714,7 @@ void colorWipeRange_wave_foot(uint32_t c, uint32_t wait) {
 
 void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
   uint32_t g = ARM_LEFT_LED / 2;
-  
+
   for (uint16_t i = ARM_LEFT_LED; i > 0; i--) {
     // ボディー部分
     bodyLeft.setPixelColor(i, c);
@@ -682,7 +722,7 @@ void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
     bodyLeft.show();
     bodyRight.show();
     delay(wait);
-    
+
     // アーム部分
     if (i >= ARM_LEFT_LED / 2) {
       uint16_t armPos = i - (ARM_LEFT_LED / 2 + 1);
@@ -702,52 +742,87 @@ void colorWipeRange_wave_bodyarm(uint32_t c, uint32_t wait) {
 
 // ==================== LED移動用 ====================
 
-void LEDMOVE(uint32_t c, uint8_t wait,uint32_t right_start,uint32_t right_end,uint32_t num,uint32_t left_start,uint32_t left_end,int32_t ledmovenum) {
-uint32_t komatsu_move_Led;
-komatsu_move_Led=ARM_LEFT_LED;
-  for(int16_t k=num; k>= -ledmovenum; k--) {//右から左
-    
-         armRight.setPixelColor(k, c);
-         armRight.show();
-         armRight.setPixelColor(k+ledmovenum, armRight.Color(0,0,0));
-         armRight.show();
+void LEDMOVE(uint32_t c, uint8_t wait, uint32_t right_start, uint32_t right_end, uint32_t num, uint32_t left_start, uint32_t left_end, int32_t ledmovenum) {
+  uint32_t komatsu_move_Led;
+  komatsu_move_Led = ARM_LEFT_LED;
+  for (int16_t k = num; k >= -ledmovenum; k--) {  //右から左
+
+    armRight.setPixelColor(k, c);
+    armRight.show();
+    armRight.setPixelColor(k + ledmovenum, armRight.Color(0, 0, 0));
+    armRight.show();
 
     delay(wait);
   }
 
   //ボディーの光る
-   set_body_right_Color(getWhiteColor());
-   delay(wait+50);
-   setAllColor(0);
-   set_body_left_Color(getWhiteColor());
-   delay(wait+50);
-   setAllColor(0);
+  set_body_right_Color(getWhiteColor());
+  delay(wait + 50);
+  setAllColor(0);
+  set_body_left_Color(getWhiteColor());
+  delay(wait + 50);
+  setAllColor(0);
 
-  for(int16_t k=0; k <= num+ledmovenum; k++) {//左から右
-       if (k <= num) {
-        komatsu_move_Led=komatsu_move_Led-1;
-        armLeft.setPixelColor(k, c);
-        armLeft.setPixelColor(komatsu_move_Led, c);
-        armLeft.show();
-        armLeft.setPixelColor(k-ledmovenum, armLeft.Color(0,0,0));
-        armLeft.setPixelColor(komatsu_move_Led+ledmovenum, armLeft.Color(0,0,0));
-        armLeft.show();
-         delay(wait);
-       }
-        
+  for (int16_t k = 0; k <= num + ledmovenum; k++) {  //左から右
+    if (k <= num) {
+      komatsu_move_Led = komatsu_move_Led - 1;
+      armLeft.setPixelColor(k, c);
+      armLeft.setPixelColor(komatsu_move_Led, c);
+      armLeft.show();
+      armLeft.setPixelColor(k - ledmovenum, armLeft.Color(0, 0, 0));
+      armLeft.setPixelColor(komatsu_move_Led + ledmovenum, armLeft.Color(0, 0, 0));
+      armLeft.show();
+      delay(wait);
+    }
 
-       if (k > num) { //移動LED個数を最後消灯させる
-             for(int16_t i=ledmovenum; i>=0 ; i--) {
-              armLeft.setPixelColor(k-i, armLeft.Color(0,0,0));
-              armLeft.setPixelColor(komatsu_move_Led+i, armLeft.Color(0,0,0));
-              armLeft.show();
-              delay(wait);
-             }
-        }
-   
+
+    if (k > num) {  //移動LED個数を最後消灯させる
+      for (int16_t i = ledmovenum; i >= 0; i--) {
+        armLeft.setPixelColor(k - i, armLeft.Color(0, 0, 0));
+        armLeft.setPixelColor(komatsu_move_Led + i, armLeft.Color(0, 0, 0));
+        armLeft.show();
+        delay(wait);
+      }
+    }
   }
 }
 
+// ==================== ウェーブ効果 上から下点灯　小松用====================
+void colorWipeRange_wave_foot2(uint32_t c, uint32_t wait) {
+  for (uint16_t i = 0; i < LEG_RIGHT_LED; i++) {
+    legRight.setPixelColor(i, c);
+    legLeft.setPixelColor(i, c);
+    legRight.show();
+    legLeft.show();
+    delay(wait);
+  }
+}
+
+void colorWipeRange_wave_bodyarm2(uint32_t c, uint32_t wait) {
+  uint32_t g = ARM_LEFT_LED / 2;
+
+  for (uint16_t i = 0; i < ARM_LEFT_LED; i++) {
+    // ボディー部分
+    bodyLeft.setPixelColor(i, c);
+    bodyRight.setPixelColor(i, c);
+    bodyLeft.show();
+    bodyRight.show();
+    delay(wait);
+
+    // アーム部分
+    if (i >= ARM_LEFT_LED / 2) {
+      uint16_t armPos = i - (ARM_LEFT_LED / 2 + 1);
+      armLeft.setPixelColor(armPos, c);
+      armRight.setPixelColor(armPos, c);
+      armLeft.setPixelColor(g, c);
+      armRight.setPixelColor(g, c);
+      armLeft.show();
+      armRight.show();
+      g++;
+      delay(wait);
+    }
+  }
+}
 
 // ---------- 白パート用関数 ----------
 // relayFromBodyCenterBoth()のヘルパー関数：指定位置に「5個の光の塊」を出す
