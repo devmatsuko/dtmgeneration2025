@@ -13,7 +13,7 @@
 #include <Adafruit_NeoPixel.h>
 
 // ==================== LED設定 ====================
-#define BRIGHTNESS 100
+#define BRIGHTNESS 255
 
 // LED個数
 #define ARM_LEFT_LED 36
