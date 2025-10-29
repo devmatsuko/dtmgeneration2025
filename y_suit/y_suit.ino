@@ -14,7 +14,7 @@
 
 // ==================== 設定値 ====================
 // LED設定
-#define BRIGHTNESS 100
+#define BRIGHTNESS 255
 
 // LED個数
 #define ARM_LEFT_LED   36
@@ -113,6 +113,9 @@
 //カラーチェンジpart2
 #define LED_PART_PINK_COLOR armLeft.Color(255, 0, 55, 0)//ピンク色
 #define LED_PART_WHITE_COLOR armLeft.Color(0, 0, 0, 255)//白色
+#define LED_PART_BLUE_COLOR armLeft.Color(0, 155, 255, 0)//水色
+#define LED_PART_GREEN_COLOR armLeft.Color(0, 255, 50, 0)//緑
+#define LED_PART_YELLOW_COLOR armLeft.Color(255, 255, 0, 0)//黄色
 #define LED_WHITE_PINK_WAIT   7500   // 点灯までの時間
 #define LED_WHITE_PINK_WAIT2   3000   // 点灯までの時間
 
@@ -130,8 +133,73 @@
 #define LED_PINK_WAIT    6500   // 点灯までの時間
 #define LED_PINK_WAIT2   3000   // 消灯までの時間
 
+// 中央への集光 カラチェン用
+#define LED_CENTER_WAIT2       4200  // 開始待ち時間
+#define LED_CENTER_WAIT3       1000  // 　白
+#define LED_CENTER_WAIT4       1000  //ピンク
+#define LED_CENTER_WAIT5       500  // 開始待ち時間
 
-//(LED_MOVE_COLOR, LED_MOVE_SPEED,LEDMOVE_RIGHT_START,LEDMOVE_RIGHT_END,LEDMOVE_LEFT_END,LEDMOVE_LEFT_START,LEDMOVE_LEFT_END,LED_MOVE_NUM) ;
+#define LED_CENTER_SPEED2      10    // 点灯速度
+#define LED_CENTER_NUM_MOVE2   5     // 移動個数
+#define LED_CENTER_TIME2       1     // 繰り返し回数
+#define LED_CENTER_OFFSET2     2     // 位置調整
+// 中央への集光　アーム カラチェン用
+#define LED_CENTER_ARM_WAIT 1500   // 開始待ち時間
+#define LED_CENTER_ARM_SPEED 10    // 点灯速度
+#define LED_CENTER_NUM_ARM_MOVE 5  // 移動個数
+#define LED_CENTER_ARM_TIME 1      // 繰り返し回数
+#define LED_CENTER_ARM_OFFSET 2    // 位置調整
+
+// じわじわ光る（消えない）カラーチェンジ
+#define PULSE_HOLD_WAIT_COLOR       0     // 開始待ち時間
+// #define PULSE_HOLD_WAIT2_COLOR      0  // 部位間待ち時間
+// #define PULSE_HOLD_WAIT3_COLOR      23000  // 開始待ち時間2
+// #define PULSE_HOLD_WAIT4_COLOR      7000  // 開始待ち時間2
+#define PULSE_HOLD_TIME_COLOR       1     // 点滅回数
+#define PULSE_HOLD_SPACE_COLOR      5     // 点滅間隔
+#define PULSE_HOLD_SPEED_COLOR      5     // 点灯速度
+
+//LED の移動 カラーチェンジ
+#define LEDMOVE_WAIT_A 0                         //待ち時間
+#define LED_MOVE_NUM_A 5                              // 移動個数
+#define LED_MOVE_COLOR_A armLeft.Color(255, 0, 55, 0)  //色
+#define LED_MOVE_SPEED_A 15                           // 点灯速度 20
+#define LEDMOVE_RIGHT_START_A 17                      //右腕スタート地点
+#define LEDMOVE_RIGHT_END_A 0                         //右腕地点エンド地点
+#define LEDMOVE_LEFT_START_A 0                        //左腕スタート地点
+#define LEDMOVE_LEFT_END_A 17                         //左腕地点エンド地点
+
+//ピンクアピール　カラーチェンジ
+#define PINK_COLOR_WAIT 7400                         //アピールのピンク
+#define PINK_COLOR_WAIT2 5800                         //アピールのピンク
+
+// 8. パチ屋
+#define DARK_DANCE_WAIT    17200  // 開始待ち時間
+#define DARK_DANCE_SPEED   20    // 点灯速度
+#define DARK_DANCE_TIME    37    // 繰り返し回数
+
+// 衣装切り替え
+#define DARK_DANCE_WAIT2     0  // 開始待ち時間
+#define DARK_DANCE_TIME2     22     // 切替回数
+#define DARK_DANCE_SPACE2   35  // 切替間隔
+
+//白光固定
+#define DARK_DANCE_WAIT3     2000  // 開始待ち時間
+
+//カイリキーラストカラー
+#define KAIRIKI_COLOR_WAIT     15000  // 開始待ち時間 点灯
+#define KAIRIKI_COLOR_WAIT2     4500  // 開始待ち時間 消灯
+
+//ドクター惨状
+#define PULSE_HOLD_WAIT_DOCTOR      3500     // 点灯待ち時間
+#define PULSE_WHITE_TIME_DOCTOR      2     // 点滅回数
+#define PULSE_WHITE_SPACE_DOCTOR     5     // 点滅間隔
+#define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
+#define PULSE_HOLD_WAIT_DOCTOR2      6500     // 点灯待ち時間
+#define WAVE_TIME_DOCTOR             1    // 点灯間隔　下から上の消灯
+#define WAVE_NUM_DOCTOR            3    // 点灯間隔
+#define WAVE_WAIT_DOCOR2     500 // 2回目の待ち時間  
+
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -264,36 +332,97 @@ void performMainSequence() {
        //じわじわ全身
     delay(PULSE_HOLD_WAIT3);
      pulseWhiteAll(PULSE_WHITE_TIME2, PULSE_WHITE_SPACE2, PULSE_WHITE_SPEED2); 
+    
+    //諭吉カラーチェンジパート
+    // 7. 中央への集光
+    delay(LED_CENTER_WAIT2);//LED_CENTER_WAIT2
+    setAllColor(0);
+    LEDtoCenter(getWhiteColor(), LED_CENTER_SPEED2, ARM_LEFT_LED,LED_CENTER_NUM_MOVE2, LED_CENTER_TIME2, LED_CENTER_OFFSET2);
+    setAllColor(0);
+    //delay(LED_CENTER_WAIT5);
+    // pulseWhite_series_body_hold(PULSE_HOLD_TIME_COLOR, PULSE_HOLD_SPACE_COLOR, PULSE_HOLD_SPEED_COLOR);
+    set_bodyLeft_Color(LED_PART_WHITE_COLOR);
+    set_bodyRight_Color(LED_PART_WHITE_COLOR);
+    delay(LED_CENTER_WAIT3);
+    set_bodyLeft_Color(LED_PART_PINK_COLOR);
+    set_bodyRight_Color(LED_PART_PINK_COLOR);
+    delay(LED_CENTER_WAIT4);
+    setAllColor(0);
+    delay(LEDMOVE_WAIT_A);
+    LEDMOVE_UPDOWN(LED_MOVE_COLOR_A, LED_MOVE_SPEED_A, LEDMOVE_RIGHT_START_A, LEDMOVE_RIGHT_END_A, LEDMOVE_LEFT_END_A, LEDMOVE_LEFT_START_A, LEDMOVE_LEFT_END_A, LED_MOVE_NUM_A);
+    delay(PINK_COLOR_WAIT);
+    setAllColor(LED_PART_PINK_COLOR);
+    delay(PINK_COLOR_WAIT2);
+    setAllColor(0);
 
-  //アピール全身白
-   delay(LED_WHITE_WAIT);
-   setAllColor(LED_WHITE_COLOR);    
-   delay(LED_WHITE_WAIT2);
+    // 8. パチ屋
+    delay(DARK_DANCE_WAIT);
+    theaterChase(getWhiteColor(), DARK_DANCE_SPEED, DARK_DANCE_TIME);
+
+    // 5. 衣装切り替え
+   delay(DARK_DANCE_WAIT2);
+   suits_led_change(getWhiteColor(), 0, DARK_DANCE_TIME2, DARK_DANCE_SPACE2);
+   setAllColor(LED_WHITE_COLOR);   
+   delay(DARK_DANCE_WAIT3);
+   setAllColor(0);
+   delay(KAIRIKI_COLOR_WAIT); 
+   set_armleft_Color(LED_PART_YELLOW_COLOR);//黄色
+   set_armright_Color(LED_PART_PINK_COLOR);//ピンク
+   set_bodyLeft_Color(LED_PART_YELLOW_COLOR);//黄色
+   set_bodyRight_Color(LED_PART_PINK_COLOR);//ピンク
+   set_legRight_Color(LED_PART_GREEN_COLOR);//緑
+   set_legLeft_Color(LED_PART_BLUE_COLOR);//青色
+   delay(KAIRIKI_COLOR_WAIT2); 
    setAllColor(0);
 
-   delay(LED_WHITE_PINK_WAIT);
-   set_armleft_Color(LED_PART_PINK_COLOR);
-   set_armright_Color(LED_PART_WHITE_COLOR);
-   set_bodyLeft_Color(LED_PART_WHITE_COLOR);
-   set_bodyRight_Color(LED_PART_PINK_COLOR);
-   set_legRight_Color(LED_PART_PINK_COLOR);
-   set_legLeft_Color(LED_PART_WHITE_COLOR);
-   delay(LED_WHITE_PINK_WAIT2);
-   setAllColor(0);
+   //２曲目ドクター登場
+   delay(PULSE_HOLD_WAIT_DOCTOR);
+   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   setAllColor(LED_WHITE_COLOR);   
+   delay(PULSE_HOLD_WAIT_DOCTOR2);
+   // 4. ロックマンLED移動
+   colorWipeRange_wave_foot_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR) ;
+   colorWipeRange_wave_bodyarm_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR);
+
+  // //アピール全身白
+  //  delay(LED_WHITE_WAIT);
+  //  setAllColor(LED_WHITE_COLOR);    
+  //  delay(LED_WHITE_WAIT2);
+  //  setAllColor(0);
+
+  // //  delay(LED_WHITE_PINK_WAIT);
+  //  set_armleft_Color(LED_PART_PINK_COLOR);
+  //  set_armright_Color(LED_PART_WHITE_COLOR);
+  //  set_bodyLeft_Color(LED_PART_WHITE_COLOR);
+  //  set_bodyRight_Color(LED_PART_PINK_COLOR);
+  //  set_legRight_Color(LED_PART_PINK_COLOR);
+  //  set_legLeft_Color(LED_PART_WHITE_COLOR);
+  //  delay(LED_WHITE_PINK_WAIT2);
+  //  setAllColor(0);
  
   delay(10000000);
 }
 
 void performDebugSequence() {
 
- delay(LED_WHITE_PINK_WAIT);
- set_armleft_Color(LED_PART_PINK_COLOR);
- set_armright_Color(LED_PART_WHITE_COLOR);
- set_bodyLeft_Color(LED_PART_PINK_COLOR);
- set_bodyRight_Color(LED_PART_WHITE_COLOR);
- set_legRight_Color(LED_PART_PINK_COLOR);
- set_legLeft_Color(LED_PART_WHITE_COLOR);
-       
+    
+   //じわじわ全身
+   delay(PULSE_HOLD_WAIT_DOCTOR);
+   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   setAllColor(LED_WHITE_COLOR);   
+   delay(PULSE_HOLD_WAIT_DOCTOR2);
+   // 4. ロックマンLED移動
+   colorWipeRange_wave_foot_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR) ;
+   colorWipeRange_wave_bodyarm_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR);
+
+
+
+//  setAllColor(LED_PART_PINK_COLOR);
+  // delay(PINK_COLOR_WAIT2);
+  //  setAllColor(0);
+
+
+
   delay(10000000);
 }
 
@@ -487,6 +616,11 @@ void pulseWhite_series_momo_hold(uint16_t time, uint8_t wait, uint8_t speed) {
 
 // 腰光る（ホールド）
 void pulseWhite_series_body_hold(uint16_t time, uint8_t wait, uint8_t speed) {
+  pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, false);
+}
+
+// 腰光る（ホールド）
+void pulseWhite_series_body_hold_color(uint16_t time, uint8_t wait, uint8_t speed) {
   pulseEffect(setbodyLeftColor, setbodyRightColor, time, wait, speed, false);
 }
 
@@ -915,5 +1049,100 @@ void LEDMOVE(uint32_t c, uint8_t wait,uint32_t right_start,uint32_t right_end,ui
              }
         }
    
+  }
+}
+
+
+void LEDMOVE_UPDOWN(uint32_t c, uint8_t wait,uint32_t right_start,uint32_t right_end,uint32_t num,uint32_t left_start,uint32_t left_end,int32_t ledmovenum) {
+  uint32_t komatsu_move_Led;
+  komatsu_move_Led = ARM_LEFT_LED;
+
+    for (int16_t k = 0; k <= num + ledmovenum; k++) {  //左から右
+    if (k <= num) {
+      komatsu_move_Led = komatsu_move_Led - 1;
+      armRight.setPixelColor(k, c);
+      armRight.setPixelColor(komatsu_move_Led, c);
+      armRight.show();
+      armRight.setPixelColor(k - ledmovenum, armLeft.Color(0, 0, 0));
+      armRight.setPixelColor(komatsu_move_Led + ledmovenum, armLeft.Color(0, 0, 0));
+      armRight.show();
+
+      armLeft.setPixelColor(k, c);
+      armLeft.setPixelColor(komatsu_move_Led, c);
+      armLeft.show();
+      armLeft.setPixelColor(k - ledmovenum, armLeft.Color(0, 0, 0));
+      armLeft.setPixelColor(komatsu_move_Led + ledmovenum, armLeft.Color(0, 0, 0));
+      armLeft.show();
+
+      delay(wait);
+    }
+
+
+    if (k > num) {  //移動LED個数を最後消灯させる
+      for (int16_t i = ledmovenum; i >= 0; i--) {
+        armRight.setPixelColor(k - i, armLeft.Color(0, 0, 0));
+        armRight.setPixelColor(komatsu_move_Led + i, armLeft.Color(0, 0, 0));
+        armRight.show();
+
+        armLeft.setPixelColor(k - i, armLeft.Color(0, 0, 0));
+        armLeft.setPixelColor(komatsu_move_Led + i, armLeft.Color(0, 0, 0));
+        armLeft.show();
+        delay(wait);
+        delay(wait);
+      }
+    }
+  }
+}
+
+
+// ==================== 中央への集光 ====================
+void LEDtoCenter_arm_uptodown(uint32_t c, uint8_t wait, uint8_t num, uint8_t numMove,
+                     uint8_t time, uint8_t offset) {
+  for (uint16_t t = 0; t < time; t++) {
+    uint8_t i = 0;
+    uint8_t g = 0;
+    uint8_t u = LEG_RIGHT_LED;
+
+    for (uint16_t k = num; k > 0; k--) {
+      // // ボディー上から下
+      // if (i < (BODY_LEFT_LED / 2) - numMove - offset) {
+      //   bodyLeft.setPixelColor(i, c);
+      //   bodyRight.setPixelColor(i, c);
+      //   bodyLeft.show();
+      //   bodyRight.show();
+      //   i++;
+      // }
+
+      // // ボディー下から上
+      // if (k >= (BODY_LEFT_LED / 2) - numMove - offset) {
+      //   bodyLeft.setPixelColor(k, c);
+      //   bodyRight.setPixelColor(k, c);
+      //   bodyLeft.show();
+      //   bodyRight.show();
+      // }
+
+      // アーム下から上
+      if (k >= ARM_LEFT_LED / 2) {
+        uint16_t armPos = k - (ARM_LEFT_LED + 2) / 2;
+        armLeft.setPixelColor(armPos, c);
+        armRight.setPixelColor(armPos, c);
+        armLeft.show();
+        armRight.show();
+      }
+
+      // // 足下から上
+      // if (u <= k) {
+      //   legRight.setPixelColor(u, c);
+      //   legLeft.setPixelColor(u, c);
+      //   legRight.show();
+      //   legLeft.show();
+      //   u--;
+      // }
+
+      // 前のLEDを消灯
+      clearPreviousLEDs(k, g, numMove);
+      delay(wait);
+      g++;
+    }
   }
 }
