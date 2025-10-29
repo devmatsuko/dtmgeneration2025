@@ -109,6 +109,51 @@
 #define DISK_MOVE_FLASH 100                        // 光
 #define DISK_MOVE_SPACE3 40                        // 点灯間隔
 
+//全身ピンク
+#define DISK_MOVE_PINK_WAIT 31250//ピンクディスクの移動
+
+//小松マルチカラーパート
+#define DISK_MOVE_BLUE_WAIT 2000//緑点灯待ち
+#define DISK_MOVE_GREEN_WAIT 1800//緑点灯待ち
+#define DISK_MOVE_YELLOW_WAIT 1800//黄色点灯待ち
+#define DISK_MOVE_MULTICOLOR_WAIT 4000//マルチカラー点灯待ち
+#define DISK_MOVE_MULTICOLOR_WAIT2 3000//マルチカラー消灯待ち
+
+
+// 8. パチ屋
+#define DARK_DANCE_WAIT    4600  // 開始待ち時間
+#define DARK_DANCE_SPEED   20    // 点灯速度
+#define DARK_DANCE_TIME    37    // 繰り返し回数
+
+// 衣装切り替え
+#define DARK_DANCE_WAIT2     0  // 開始待ち時間
+#define DARK_DANCE_TIME2     22     // 切替回数
+#define DARK_DANCE_SPACE2    35  // 切替間隔
+
+//白光固定
+#define DARK_DANCE_WAIT3     2000  // 開始待ち時間
+
+//カイリキーラストカラー
+#define KAIRIKI_COLOR_WAIT     15100  // 開始待ち時間 点灯
+#define KAIRIKI_COLOR_WAIT2     4500  // 開始待ち時間 消灯
+
+//カラーパート
+#define LED_PART_PINK_COLOR armLeft.Color(255, 0, 55, 0)//ピンク色
+#define LED_PART_WHITE_COLOR armLeft.Color(0, 0, 0, 255)//白色
+#define LED_PART_BLUE_COLOR armLeft.Color(0, 155, 255, 0)//水色
+#define LED_PART_GREEN_COLOR armLeft.Color(0, 255, 50, 0)//緑
+#define LED_PART_YELLOW_COLOR armLeft.Color(255, 255, 0, 0)//黄色
+#define LED_PART_WHITE_COLOR armLeft.Color(0, 0, 0, 255)//白色
+
+//ドクター惨状
+#define PULSE_HOLD_WAIT_DOCTOR      3500     // 点灯待ち時間
+#define PULSE_WHITE_TIME_DOCTOR      2     // 点滅回数
+#define PULSE_WHITE_SPACE_DOCTOR     5     // 点滅間隔
+#define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
+#define PULSE_HOLD_WAIT_DOCTOR2      6500     // 点灯待ち時間
+#define WAVE_TIME_DOCTOR             1    // 点灯間隔　下から上の消灯
+#define WAVE_NUM_DOCTOR            3    // 点灯間隔
+#define WAVE_WAIT_DOCOR2     500 // 2回目の待ち時間  
 
 
 
@@ -241,6 +286,54 @@ void performMainSequence() {
   // アピール！きらきら〜☆
   sparkleFullBody(DISK_MOVE_NUM, getWhiteColor(), DISK_MOVE_FLASH, DISK_MOVE_SPACE3);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
 
+    delay(DISK_MOVE_PINK_WAIT);
+    setAllColor(LED_PART_PINK_COLOR);
+    delay(DISK_MOVE_BLUE_WAIT);
+    setAllColor(LED_PART_BLUE_COLOR);
+    delay(DISK_MOVE_GREEN_WAIT);
+    setAllColor(LED_PART_GREEN_COLOR);
+    delay(DISK_MOVE_YELLOW_WAIT);
+    setAllColor(LED_PART_YELLOW_COLOR);
+    delay(DISK_MOVE_MULTICOLOR_WAIT);
+    set_armleft_Color(LED_PART_YELLOW_COLOR);//水色
+    set_armright_Color(LED_PART_GREEN_COLOR);//緑
+    set_bodyLeft_Color(LED_PART_PINK_COLOR);//ピンク
+    set_bodyRight_Color(LED_PART_BLUE_COLOR);//水色
+    set_legRight_Color(LED_PART_BLUE_COLOR);//緑
+    set_legLeft_Color(LED_PART_PINK_COLOR);//ピンク
+    delay(DISK_MOVE_MULTICOLOR_WAIT2);
+    setAllColor(0);
+
+    // 8. パチ屋
+    delay(DARK_DANCE_WAIT);
+    theaterChase(getWhiteColor(), DARK_DANCE_SPEED, DARK_DANCE_TIME);
+
+    // 5. 衣装切り替え
+   delay(DARK_DANCE_WAIT2);
+   suitsLedChange(getWhiteColor(), 0, DARK_DANCE_TIME2, DARK_DANCE_SPACE2);
+   setAllColor(LED_PART_WHITE_COLOR);   
+   delay(DARK_DANCE_WAIT3);
+   setAllColor(0);
+
+   delay(KAIRIKI_COLOR_WAIT); 
+   set_armleft_Color(LED_PART_BLUE_COLOR);//水色
+   set_armright_Color(LED_PART_GREEN_COLOR);//緑
+   //  set_bodyLeft_Color(LED_PART_YELLOW_COLOR);//黄色
+   //  set_bodyRight_Color(LED_PART_PINK_COLOR);//ピンク
+   //  set_legRight_Color(LED_PART_GREEN_COLOR);//緑
+   //  set_legLeft_Color(LED_PART_BLUE_COLOR);//青色
+   delay(KAIRIKI_COLOR_WAIT2); 
+   setAllColor(0);
+
+   //２曲目ドクター登場
+   delay(PULSE_HOLD_WAIT_DOCTOR);
+   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   setAllColor(LED_PART_WHITE_COLOR);   
+   delay(PULSE_HOLD_WAIT_DOCTOR2);
+   // 4. ロックマンLED移動
+   colorWipeRange_wave_foot_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR) ;
+   colorWipeRange_wave_bodyarm_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR);
+
 
   // 終了（無限待機）
   delay(10000000);
@@ -248,29 +341,47 @@ void performMainSequence() {
 
 // デバッグシーケンス
 void performDebugSequence() {
-  // デバッグ用の処理をここに記述
-  delay(DISK_MOVE_WAIT0);
+    delay(DISK_MOVE_PINK_WAIT);
+    setAllColor(LED_PART_PINK_COLOR);
+    delay(DISK_MOVE_BLUE_WAIT);
+    setAllColor(LED_PART_BLUE_COLOR);
+    delay(DISK_MOVE_GREEN_WAIT);
+    setAllColor(LED_PART_GREEN_COLOR);
+    delay(DISK_MOVE_YELLOW_WAIT);
+    setAllColor(LED_PART_YELLOW_COLOR);
+    delay(DISK_MOVE_MULTICOLOR_WAIT);
+    set_armleft_Color(LED_PART_YELLOW_COLOR);//水色
+    set_armright_Color(LED_PART_GREEN_COLOR);//緑
+    set_bodyLeft_Color(LED_PART_PINK_COLOR);//ピンク
+    set_bodyRight_Color(LED_PART_BLUE_COLOR);//水色
+    set_legRight_Color(LED_PART_BLUE_COLOR);//緑
+    set_legLeft_Color(LED_PART_PINK_COLOR);//ピンク
+    delay(DISK_MOVE_MULTICOLOR_WAIT2);
+    setAllColor(0);
 
-  // 小松さん白パート（時間調整はしてないです。エフェクトを並べただけ）
-  // 2枚分裂で半身ずつ上下に光が移動（終端で消える）
-  relayFromBodyCenterBoth(getWhiteColor(), DISK_MOVE_SPACE1); // 第二引数小さいほど早くなる DISK_MOVE_SPACE1 15
-  delay(DISK_MOVE_WAIT);//DISK_MOVE_WAIT 2000
+    // 8. パチ屋
+    delay(DARK_DANCE_WAIT);
+    theaterChase(getWhiteColor(), DARK_DANCE_SPEED, DARK_DANCE_TIME);
 
-  // 右手1枚出現時に右足点灯
-  setLegRightThigh(getWhiteColor());
-  delay(DISK_MOVE_WAIT2);//DISK_MOVE_WAIT2 1000
-  setAllColor(0);
+    // 5. 衣装切り替え
+   delay(DARK_DANCE_WAIT2);
+   suitsLedChange(getWhiteColor(), 0, DARK_DANCE_TIME2, DARK_DANCE_SPACE2);
+   setAllColor(LED_PART_WHITE_COLOR);   
+   delay(DARK_DANCE_WAIT3);
+   setAllColor(0);
 
-  // 1から5枚にするところで下から光が充填されていく
-  fillFromLegsToArms(getWhiteColor(), DISK_MOVE_SPACE2);//DISK_MOVE_SPACE2 50
-  delay(DISK_MOVE_WAIT3);//DISK_MOVE_WAIT3 2000
-  setAllColor(0);
-
-  // アピール！きらきら〜☆
-  sparkleFullBody(DISK_MOVE_NUM, getWhiteColor(), DISK_MOVE_FLASH, DISK_MOVE_SPACE3);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
-
+   delay(KAIRIKI_COLOR_WAIT); 
+   set_armleft_Color(LED_PART_BLUE_COLOR);//水色
+   set_armright_Color(LED_PART_GREEN_COLOR);//緑
+  //  set_bodyLeft_Color(LED_PART_YELLOW_COLOR);//黄色
+  //  set_bodyRight_Color(LED_PART_PINK_COLOR);//ピンク
+  //  set_legRight_Color(LED_PART_GREEN_COLOR);//緑
+  //  set_legLeft_Color(LED_PART_BLUE_COLOR);//青色
+   delay(KAIRIKI_COLOR_WAIT2); 
+   setAllColor(0);
 
   delay(10000000);
+
 }
 
 // ==================== 色制御関数 ====================
@@ -1027,5 +1138,102 @@ void sparkleFullBody(int numLEDs, uint32_t color, int flashes, uint16_t wait) {
   for (int i = 0; i < 6; i++) {
     allParts[i]->clear();
     allParts[i]->show();
+  }
+}
+
+// ==================== パチ屋 ====================
+void theaterChase(uint32_t c, uint8_t wait, uint8_t cycle) {
+  for (int j = 0; j < cycle; j++) {
+    for (int q = 0; q < 3; q++) {
+      // 3つおきにLEDを点灯
+      for (uint16_t i = 0; i < ARM_RIGHT_LED; i = i + 3) {
+        setTheaterPixel(&armLeft, i + q, c);
+        setTheaterPixel(&bodyLeft, i + q, c);
+        setTheaterPixel(&bodyRight, i + q, c);
+        setTheaterPixel(&armRight, i + q, c);
+        setTheaterPixel(&legRight, i + q, c);
+        setTheaterPixel(&legLeft, i + q, c);
+      }
+      showAllStrips();
+      delay(wait);
+      
+      // 消灯
+      for (uint16_t i = 0; i < ARM_RIGHT_LED; i = i + 3) {
+        setTheaterPixel(&armLeft, i + q, 0);
+        setTheaterPixel(&bodyLeft, i + q, 0);
+        setTheaterPixel(&bodyRight, i + q, 0);
+        setTheaterPixel(&armRight, i + q, 0);
+        setTheaterPixel(&legRight, i + q, 0);
+        setTheaterPixel(&legLeft, i + q, 0);
+      }
+      showAllStrips();
+    }
+  }
+}
+
+
+void set_armleft_Color(uint32_t color) {
+  setStripColor(&armLeft, color, 0, armLeft.numPixels());
+}
+
+void set_armright_Color(uint32_t color) {
+  setStripColor(&armRight, color, 0, armRight.numPixels());
+}
+void set_bodyLeft_Color(uint32_t color) {
+   setStripColor(&bodyLeft, color, 0, bodyLeft.numPixels());
+}
+void set_bodyRight_Color(uint32_t color) {
+  setStripColor(&bodyRight, color, 0, bodyRight.numPixels());
+}
+void set_legRight_Color(uint32_t color) {
+    setStripColor(&legRight, color, 0, legRight.numPixels());
+}
+void set_legLeft_Color(uint32_t color) {
+     setStripColor(&legLeft, color, 0, legLeft.numPixels());
+}
+
+void setTheaterPixel(Adafruit_NeoPixel* strip, uint16_t pos, uint32_t color) {
+  if (pos < strip->numPixels()) {
+    strip->setPixelColor(pos, color);
+  }
+}
+
+// ==================== ウェーブ効果 下から上　消灯====================
+void colorWipeRange_wave_foot_off(uint32_t wait,uint32_t off_num) {
+  for (int16_t i = LEG_RIGHT_LED; i >= 0; i--) {
+    uint32_t c;
+    c=armLeft.Color(0, 0, 0, 0);
+    legRight.setPixelColor(i, c);
+    legLeft.setPixelColor(i, c);
+    legRight.show();
+    legLeft.show();
+    delay(wait);
+  }
+}
+
+void colorWipeRange_wave_bodyarm_off(uint32_t wait,uint32_t off_num) {
+  uint32_t g = ARM_LEFT_LED / 2;
+  uint32_t c;
+  c=armLeft.Color(0, 0, 0, 0);
+  for (int16_t i = ARM_LEFT_LED; i >= 0; i--) {
+    // ボディー部分
+    bodyLeft.setPixelColor(i, c);
+    bodyRight.setPixelColor(i, c);
+    bodyLeft.show();
+    bodyRight.show();
+    delay(wait);
+    
+    // アーム部分
+    if (i >= ARM_LEFT_LED / 2) {
+      uint16_t armPos = i - (ARM_LEFT_LED / 2 + 1);
+      armLeft.setPixelColor(armPos, c);
+      armRight.setPixelColor(armPos, c);
+      armLeft.setPixelColor(g, c);
+      armRight.setPixelColor(g, c);
+      armLeft.show();
+      armRight.show();
+      g++;
+      delay(wait);
+    }
   }
 }
