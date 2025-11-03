@@ -92,10 +92,10 @@
 //飛行パート　
   // 小松さん白パート（時間調整はしてないです。エフェクトを並べただけ）
   // 2枚分裂で半身ずつ上下に光が移動（終端で消える）1:40
-#define DISK_MOVE_WAIT0 4500                         //待ち時間
+#define DISK_MOVE_WAIT0 4000                         //待ち時間
 
 #define DISK_MOVE_SPACE1 15                         // 点灯間隔
-#define DISK_MOVE_WAIT 9500                         //待ち時間
+#define DISK_MOVE_WAIT 10000                         //待ち時間
 
  // 右手1枚出現時に右足点灯 1:44
 #define DISK_MOVE_WAIT2 1000                        // 次の光の待ち時間
