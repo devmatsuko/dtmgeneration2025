@@ -188,17 +188,29 @@
 
 //カイリキーラストカラー
 #define KAIRIKI_COLOR_WAIT     15000  // 開始待ち時間 点灯
-#define KAIRIKI_COLOR_WAIT2     4500  // 開始待ち時間 消灯
+#define KAIRIKI_COLOR_WAIT2     4250  // 開始待ち時間 消灯
 
 //ドクター惨状
-#define PULSE_HOLD_WAIT_DOCTOR      3500     // 点灯待ち時間
+#define PULSE_HOLD_WAIT_DOCTOR       0     // 点灯待ち時間
 #define PULSE_WHITE_TIME_DOCTOR      2     // 点滅回数
-#define PULSE_WHITE_SPACE_DOCTOR     5     // 点滅間隔
+#define PULSE_WHITE_SPACE_DOCTOR     15     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
-#define PULSE_HOLD_WAIT_DOCTOR2      6500     // 点灯待ち時間
+#define PULSE_HOLD_WAIT_DOCTOR2      500     // 点灯待ち時間
+#define PULSE_HOLD_WAIT_DOCTOR_OFF   49000     // 点灯待ち時間 きらきら
+#define PULSE_WHITE_SPACE_DOCTOR_OFF     115     // 点滅間隔
+#define PULSE_WHITE_SPEED_DOCTOR_OFF     1     // 点灯 カウント数
 #define WAVE_TIME_DOCTOR             1    // 点灯間隔　下から上の消灯
 #define WAVE_NUM_DOCTOR            3    // 点灯間隔
 #define WAVE_WAIT_DOCOR2     500 // 2回目の待ち時間  
+
+  // ポイ後の諭吉、小松の惨状
+#define YUKICHI_KOMATSU_APP_NUM 50                          // 点灯個数
+#define YUKICHI_KOMATSU_APP_FLASH 129                        // 光
+#define YUKICHI_KOMATSU_APP_SPACE3 40                        // 点灯間隔
+#define YUKICHI_KOMATSU_APP_WAIT  0                       //白固定までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT2 8200                       //ピンク点灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT3 7500                       //ピンク消灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT4 15000                       //レインボーまでも待ち時間
 
 
 // ==================== グローバル変数 ====================
@@ -378,12 +390,20 @@ void performMainSequence() {
    //２曲目ドクター登場
    delay(PULSE_HOLD_WAIT_DOCTOR);
    pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
-   setAllColor(LED_WHITE_COLOR);   
-   delay(PULSE_HOLD_WAIT_DOCTOR2);
-   // 4. ロックマンLED移動
-   colorWipeRange_wave_foot_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR) ;
-   colorWipeRange_wave_bodyarm_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR);
-
+   delay(PULSE_HOLD_WAIT_DOCTOR2);//無音のところ
+   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   setAllColor(LED_WHITE_COLOR);     
+   pulseWhiteAll_off(1, PULSE_WHITE_SPACE_DOCTOR_OFF, PULSE_WHITE_SPEED_DOCTOR_OFF); 
+   delay(PULSE_HOLD_WAIT_DOCTOR_OFF);//48秒徐々にフェードアウト～次の登場まで
+  sparkleFullBody(YUKICHI_KOMATSU_APP_NUM, getWhiteColor(), YUKICHI_KOMATSU_APP_FLASH, YUKICHI_KOMATSU_APP_SPACE3);  // きらきら　全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
+   delay(YUKICHI_KOMATSU_APP_WAIT);//7秒白固定待ち時間
+  setAllColor(LED_WHITE_COLOR); 
+   delay(YUKICHI_KOMATSU_APP_WAIT2);//7秒諭吉ピンク点灯待ち
+   setAllColor(LED_PART_PINK_COLOR);// 
+   delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
+   setAllColor(0);//
+   delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
+   rainbowCycleAll(10);
   // //アピール全身白
   //  delay(LED_WHITE_WAIT);
   //  setAllColor(LED_WHITE_COLOR);    
@@ -405,23 +425,23 @@ void performMainSequence() {
 
 void performDebugSequence() {
 
-    
-   //じわじわ全身
-   delay(PULSE_HOLD_WAIT_DOCTOR);
+      //２曲目ドクター登場
+   //delay(PULSE_HOLD_WAIT_DOCTOR);
    pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
-   setAllColor(LED_WHITE_COLOR);   
-   delay(PULSE_HOLD_WAIT_DOCTOR2);
-   // 4. ロックマンLED移動
-   colorWipeRange_wave_foot_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR) ;
-   colorWipeRange_wave_bodyarm_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR);
-
-
-
-//  setAllColor(LED_PART_PINK_COLOR);
-  // delay(PINK_COLOR_WAIT2);
-  //  setAllColor(0);
-
-
+   delay(PULSE_HOLD_WAIT_DOCTOR2);//無音のところ
+   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   setAllColor(LED_WHITE_COLOR);     
+   pulseWhiteAll_off(1, PULSE_WHITE_SPACE_DOCTOR_OFF, PULSE_WHITE_SPEED_DOCTOR_OFF); 
+   delay(PULSE_HOLD_WAIT_DOCTOR_OFF);//48秒徐々にフェードアウト～次の登場まで
+  sparkleFullBody(YUKICHI_KOMATSU_APP_NUM, getWhiteColor(), YUKICHI_KOMATSU_APP_FLASH, YUKICHI_KOMATSU_APP_SPACE3);  // きらきら　全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
+   delay(YUKICHI_KOMATSU_APP_WAIT);//7秒白固定待ち時間
+  setAllColor(LED_WHITE_COLOR); 
+   delay(YUKICHI_KOMATSU_APP_WAIT2);//7秒諭吉ピンク点灯待ち
+   setAllColor(LED_PART_PINK_COLOR);// 
+   delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
+   setAllColor(0);//
+   delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
+   rainbowCycleAll(10);
 
   delay(10000000);
 }
@@ -548,6 +568,19 @@ void pulseWhiteAll(uint16_t time, uint8_t wait, uint8_t speed) {
       setAllColor(armLeft.Color(0, 0, 0, val));
       delay(wait);
     }
+    for (int j = 255; j >= 0; j -= 4) {
+            uint8_t val = pgm_read_byte(&neopix_gamma[j]);
+      setAllColor(armLeft.Color(0, 0, 0, val));
+      delay(wait);
+    }
+    delay(100);
+  }
+}
+
+// ==================== パルス効果 ====================
+void pulseWhiteAll_off(uint16_t time, uint8_t wait, uint8_t speed) {
+  for (uint16_t k = 0; k < time; k++) {
+
     for (int j = 255; j >= 0; j -= 4) {
             uint8_t val = pgm_read_byte(&neopix_gamma[j]);
       setAllColor(armLeft.Color(0, 0, 0, val));
@@ -1144,5 +1177,47 @@ void LEDtoCenter_arm_uptodown(uint32_t c, uint8_t wait, uint8_t num, uint8_t num
       delay(wait);
       g++;
     }
+  }
+}
+void sparkleFullBody(int numLEDs, uint32_t color, int flashes, uint16_t wait) {
+
+  Adafruit_NeoPixel* allParts[] = { &armLeft, &armRight, &bodyLeft, &bodyRight, &legLeft, &legRight };
+
+  // LED総数をカウント
+  int totalLEDs = 0;
+  int offsets[6]; // 各パーツの開始インデックス
+  for (int i = 0; i < 6; i++) {
+    offsets[i] = totalLEDs;
+    totalLEDs += allParts[i]->numPixels();
+  }
+
+  // ランダム点灯
+  for (int f = 0; f < flashes; f++) {
+    // まず全クリア
+    for (int i = 0; i < 6; i++) allParts[i]->clear();
+
+    for (int n = 0; n < numLEDs; n++) {
+      int r = random(totalLEDs); // 0〜totalLEDs-1
+      // どのパーツに属するか判定
+      for (int p = 0; p < 6; p++) {
+        int start = offsets[p];
+        int end = start + allParts[p]->numPixels();
+        if (r >= start && r < end) {
+          int idx = r - start;
+          allParts[p]->setPixelColor(idx, color);
+          break;
+        }
+      }
+    }
+
+    // 全パーツ更新
+    for (int i = 0; i < 6; i++) allParts[i]->show();
+    delay(wait);
+  }
+
+  // 最後に全消灯
+  for (int i = 0; i < 6; i++) {
+    allParts[i]->clear();
+    allParts[i]->show();
   }
 }
