@@ -121,11 +121,11 @@
 
 
 // 8. パチ屋
-#define DARK_DANCE_WAIT    4600  // 開始待ち時間
+#define DARK_DANCE_WAIT    4700  // 開始待ち時間
 #define DARK_DANCE_SPEED   20    // 点灯速度
 #define DARK_DANCE_TIME    37    // 繰り返し回数
 
-// 衣装切り替え
+// 衣装切り替え高速点滅
 #define DARK_DANCE_WAIT2     0  // 開始待ち時間
 #define DARK_DANCE_TIME2     22     // 切替回数
 #define DARK_DANCE_SPACE2    35  // 切替間隔
@@ -135,7 +135,7 @@
 
 //カイリキーラストカラー
 #define KAIRIKI_COLOR_WAIT     15100  // 開始待ち時間 点灯
-#define KAIRIKI_COLOR_WAIT2     4500  // 開始待ち時間 消灯
+#define KAIRIKI_COLOR_WAIT2     4250  // 開始待ち時間 消灯
 
 //カラーパート
 #define LED_PART_PINK_COLOR armLeft.Color(255, 0, 55, 0)//ピンク色
@@ -143,19 +143,31 @@
 #define LED_PART_BLUE_COLOR armLeft.Color(0, 155, 255, 0)//水色
 #define LED_PART_GREEN_COLOR armLeft.Color(0, 255, 50, 0)//緑
 #define LED_PART_YELLOW_COLOR armLeft.Color(255, 255, 0, 0)//黄色
-#define LED_PART_WHITE_COLOR armLeft.Color(0, 0, 0, 255)//白色
+#define LED_WHITE_COLOR armLeft.Color(0, 0, 0, 255)//白色
+
 
 //ドクター惨状
-#define PULSE_HOLD_WAIT_DOCTOR      3500     // 点灯待ち時間
+#define PULSE_HOLD_WAIT_DOCTOR       0     // 点灯待ち時間
 #define PULSE_WHITE_TIME_DOCTOR      2     // 点滅回数
-#define PULSE_WHITE_SPACE_DOCTOR     5     // 点滅間隔
+#define PULSE_WHITE_SPACE_DOCTOR     15     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
-#define PULSE_HOLD_WAIT_DOCTOR2      6500     // 点灯待ち時間
+#define PULSE_HOLD_WAIT_DOCTOR2      500     // 点灯待ち時間
+#define PULSE_HOLD_WAIT_DOCTOR_OFF   49200     // 点灯待ち時間 きらきら
+#define PULSE_WHITE_SPACE_DOCTOR_OFF     115     // 点滅間隔
+#define PULSE_WHITE_SPEED_DOCTOR_OFF     1     // 点灯 カウント数
 #define WAVE_TIME_DOCTOR             1    // 点灯間隔　下から上の消灯
 #define WAVE_NUM_DOCTOR            3    // 点灯間隔
 #define WAVE_WAIT_DOCOR2     500 // 2回目の待ち時間  
 
-
+  // ポイ後の諭吉、小松の惨状
+#define YUKICHI_KOMATSU_APP_NUM 50                          // 点灯個数
+#define YUKICHI_KOMATSU_APP_FLASH 129                        // 光
+#define YUKICHI_KOMATSU_APP_SPACE3 40                        // 点灯間隔
+#define YUKICHI_KOMATSU_APP_WAIT  0                       //白固定までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT0  8200                       //消灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT2  7800                       //水色点灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT3  7500                       //水色消灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT4  7400                       //レインボーまでも待ち時間
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -327,12 +339,24 @@ void performMainSequence() {
 
    //２曲目ドクター登場
    delay(PULSE_HOLD_WAIT_DOCTOR);
+ pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   delay(PULSE_HOLD_WAIT_DOCTOR2);//無音のところ
    pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
-   setAllColor(LED_PART_WHITE_COLOR);   
-   delay(PULSE_HOLD_WAIT_DOCTOR2);
-   // 4. ロックマンLED移動
-   colorWipeRange_wave_foot_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR) ;
-   colorWipeRange_wave_bodyarm_off(WAVE_TIME_DOCTOR,WAVE_NUM_DOCTOR);
+   setAllColor(LED_WHITE_COLOR);     
+   pulseWhiteAll_off(1, PULSE_WHITE_SPACE_DOCTOR_OFF, PULSE_WHITE_SPEED_DOCTOR_OFF); 
+   delay(PULSE_HOLD_WAIT_DOCTOR_OFF);//48秒徐々にフェードアウト～次の登場まで
+   sparkleFullBody(YUKICHI_KOMATSU_APP_NUM, getWhiteColor(), YUKICHI_KOMATSU_APP_FLASH, YUKICHI_KOMATSU_APP_SPACE3);  // きらきら　全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
+   delay(YUKICHI_KOMATSU_APP_WAIT);//7秒白固定待ち時間
+   setAllColor(LED_WHITE_COLOR); 
+   delay(YUKICHI_KOMATSU_APP_WAIT0);//消灯
+   setAllColor(0); 
+   delay(YUKICHI_KOMATSU_APP_WAIT2);//7秒諭吉ピンク点灯待ち
+   setAllColor(LED_PART_BLUE_COLOR);// 
+   delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
+   setAllColor(0);//
+   delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
+   rainbowCycleAll(10);
+
 
 
   // 終了（無限待機）
@@ -341,44 +365,25 @@ void performMainSequence() {
 
 // デバッグシーケンス
 void performDebugSequence() {
-    delay(DISK_MOVE_PINK_WAIT);
-    setAllColor(LED_PART_PINK_COLOR);
-    delay(DISK_MOVE_BLUE_WAIT);
-    setAllColor(LED_PART_BLUE_COLOR);
-    delay(DISK_MOVE_GREEN_WAIT);
-    setAllColor(LED_PART_GREEN_COLOR);
-    delay(DISK_MOVE_YELLOW_WAIT);
-    setAllColor(LED_PART_YELLOW_COLOR);
-    delay(DISK_MOVE_MULTICOLOR_WAIT);
-    set_armleft_Color(LED_PART_YELLOW_COLOR);//水色
-    set_armright_Color(LED_PART_GREEN_COLOR);//緑
-    set_bodyLeft_Color(LED_PART_PINK_COLOR);//ピンク
-    set_bodyRight_Color(LED_PART_BLUE_COLOR);//水色
-    set_legRight_Color(LED_PART_BLUE_COLOR);//緑
-    set_legLeft_Color(LED_PART_PINK_COLOR);//ピンク
-    delay(DISK_MOVE_MULTICOLOR_WAIT2);
-    setAllColor(0);
 
-    // 8. パチ屋
-    delay(DARK_DANCE_WAIT);
-    theaterChase(getWhiteColor(), DARK_DANCE_SPEED, DARK_DANCE_TIME);
+   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   delay(PULSE_HOLD_WAIT_DOCTOR2);//無音のところ
+   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
+   setAllColor(LED_WHITE_COLOR);     
+   pulseWhiteAll_off(1, PULSE_WHITE_SPACE_DOCTOR_OFF, PULSE_WHITE_SPEED_DOCTOR_OFF); 
+   delay(PULSE_HOLD_WAIT_DOCTOR_OFF);//48秒徐々にフェードアウト～次の登場まで
+   sparkleFullBody(YUKICHI_KOMATSU_APP_NUM, getWhiteColor(), YUKICHI_KOMATSU_APP_FLASH, YUKICHI_KOMATSU_APP_SPACE3);  // きらきら　全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
+   delay(YUKICHI_KOMATSU_APP_WAIT);//7秒白固定待ち時間
+   setAllColor(LED_WHITE_COLOR); 
+   delay(YUKICHI_KOMATSU_APP_WAIT0);//消灯
+   setAllColor(0); 
+   delay(YUKICHI_KOMATSU_APP_WAIT2);//7秒諭吉ピンク点灯待ち
+   setAllColor(LED_PART_BLUE_COLOR);// 
+   delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
+   setAllColor(0);//
+   delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
+   rainbowCycleAll(10);
 
-    // 5. 衣装切り替え
-   delay(DARK_DANCE_WAIT2);
-   suitsLedChange(getWhiteColor(), 0, DARK_DANCE_TIME2, DARK_DANCE_SPACE2);
-   setAllColor(LED_PART_WHITE_COLOR);   
-   delay(DARK_DANCE_WAIT3);
-   setAllColor(0);
-
-   delay(KAIRIKI_COLOR_WAIT); 
-   set_armleft_Color(LED_PART_BLUE_COLOR);//水色
-   set_armright_Color(LED_PART_GREEN_COLOR);//緑
-  //  set_bodyLeft_Color(LED_PART_YELLOW_COLOR);//黄色
-  //  set_bodyRight_Color(LED_PART_PINK_COLOR);//ピンク
-  //  set_legRight_Color(LED_PART_GREEN_COLOR);//緑
-  //  set_legLeft_Color(LED_PART_BLUE_COLOR);//青色
-   delay(KAIRIKI_COLOR_WAIT2); 
-   setAllColor(0);
 
   delay(10000000);
 
@@ -1237,3 +1242,17 @@ void colorWipeRange_wave_bodyarm_off(uint32_t wait,uint32_t off_num) {
     }
   }
 }
+
+// ==================== パルス効果 ====================
+void pulseWhiteAll_off(uint16_t time, uint8_t wait, uint8_t speed) {
+  for (uint16_t k = 0; k < time; k++) {
+
+    for (int j = 255; j >= 0; j -= 4) {
+            uint8_t val = pgm_read_byte(&neopix_gamma[j]);
+      setAllColor(armLeft.Color(0, 0, 0, val));
+      delay(wait);
+    }
+    delay(100);
+  }
+}
+
