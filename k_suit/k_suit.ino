@@ -121,7 +121,7 @@
 
 
 // 8. パチ屋
-#define DARK_DANCE_WAIT    4700  // 開始待ち時間
+#define DARK_DANCE_WAIT    4600  // 開始待ち時間
 #define DARK_DANCE_SPEED   20    // 点灯速度
 #define DARK_DANCE_TIME    37    // 繰り返し回数
 
@@ -130,11 +130,11 @@
 #define DARK_DANCE_TIME2     22     // 切替回数
 #define DARK_DANCE_SPACE2    35  // 切替間隔
 
-//白光固定
-#define DARK_DANCE_WAIT3     2000  // 開始待ち時間
+// //白光固定
+// #define DARK_DANCE_WAIT3     4000  // 開始待ち時間
 
 //カイリキーラストカラー
-#define KAIRIKI_COLOR_WAIT     15100  // 開始待ち時間 点灯
+#define KAIRIKI_COLOR_WAIT     19000  // 開始待ち時間 点灯
 #define KAIRIKI_COLOR_WAIT2     4250  // 開始待ち時間 消灯
 
 //カラーパート
@@ -151,7 +151,7 @@
 #define PULSE_WHITE_TIME_DOCTOR      2     // 点滅回数
 #define PULSE_WHITE_SPACE_DOCTOR     15     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
-#define PULSE_HOLD_WAIT_DOCTOR2      500     // 点灯待ち時間
+#define PULSE_HOLD_WAIT_DOCTOR2      550     // 点灯待ち時間
 #define PULSE_HOLD_WAIT_DOCTOR_OFF   49200     // 点灯待ち時間 きらきら
 #define PULSE_WHITE_SPACE_DOCTOR_OFF     115     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR_OFF     1     // 点灯 カウント数
@@ -165,9 +165,9 @@
 #define YUKICHI_KOMATSU_APP_SPACE3 40                        // 点灯間隔
 #define YUKICHI_KOMATSU_APP_WAIT  0                       //白固定までも待ち時間
 #define YUKICHI_KOMATSU_APP_WAIT0  8200                       //消灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT2  7800                       //水色点灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT3  7500                       //水色消灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT4  7400                       //レインボーまでも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT2  7700                       //水色点灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT3  7400                       //水色消灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT4  7500                       //レインボーまでも待ち時間
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -322,10 +322,10 @@ void performMainSequence() {
 
     // 5. 衣装切り替え
    delay(DARK_DANCE_WAIT2);
-   suitsLedChange(getWhiteColor(), 0, DARK_DANCE_TIME2, DARK_DANCE_SPACE2);
-   setAllColor(LED_PART_WHITE_COLOR);   
-   delay(DARK_DANCE_WAIT3);
-   setAllColor(0);
+  //  suitsLedChange(getWhiteColor(), 0, DARK_DANCE_TIME2, DARK_DANCE_SPACE2);
+  //  setAllColor(LED_PART_WHITE_COLOR);   
+  // delay(DARK_DANCE_WAIT3);
+  //  setAllColor(0);
 
    delay(KAIRIKI_COLOR_WAIT); 
    set_armleft_Color(LED_PART_BLUE_COLOR);//水色
