@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-#define BRIGHTNESS 100
+#define BRIGHTNESS 255
 
 Adafruit_NeoPixel armLeft(36, 3, NEO_GRBW + NEO_KHZ800);  // 左腕
 Adafruit_NeoPixel bodyLeft(27, 4, NEO_GRBW + NEO_KHZ800); // 左胴
@@ -123,7 +123,7 @@ void loop() {
   // サビ？スウィングパート：全身白のままor8拍ずつで色変えたり何かしら変化させる？（ポイ振ってる時横向いてるし、３人の時色変えるかもだから白のままでもいい気もする）
   delay(27500);
 
-  // スウィングパート終わりのジャンジャンジャンジャーン：ポイに合わせて半身ずつ白点灯、一瞬点灯してF.O.
+  // // スウィングパート終わりのジャンジャンジャンジャーン：ポイに合わせて半身ずつ白点灯、一瞬点灯してF.O.
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(500);
   // ｼﾞｬﾝ(左半身だけ点灯)
@@ -137,16 +137,16 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
   delay(450);
   // ジャーン（キラキラ）
-  sparkleFullBody(50, armLeft.Color(0, 0, 0, 255), 44, 40);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
+  sparkleFullBody(50, armLeft.Color(0, 0, 0, 255), 35, 40);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  delay(2000);
+  delay(1000);
    
   // ----- ドクターパート end -----
 
-  // ----- ポイパート終了後〜二人に光渡すまで start -----
+  // ----- 3人パート start -----
   fadeInBrightness(5, 1);
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  delay(1800);
+  delay(3100);
 
   // 後ろ指差す&Yk登場時のテテテン！に合わせて下から部位ごと消灯
   // 両足
@@ -158,25 +158,33 @@ void loop() {
   // 両腕
   turnOffPair(&armLeft, &armRight);
 
-  // 二人が舞台上がるまで暗転
-  delay(15000);
+  // 3人が1列になるまで消灯
+  delay(3700);
 
-  // 二人が舞台に上がり始めるあたりでF.I.
-  // fadeInBrightness(7, 1);
-  // setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  // delay(5000);
+  // 3人が1列になる
+  setAllColor(armLeft.Color(0, 0, 0, 255)); 
+  delay(3834);
 
-  // 二人に光渡して以降レインボー(仮)
-  rainbowCycleAll(5);
-  // ----- ポイパート終了後〜二人に光渡すまで end -----
-
-  // ----- 3人パート start -----
-  // 一旦仮でエンドパート〜終わりまでレインボー
-  delay(8000);
-  // ----- 3人パート end -----
+  // 小松さんに光移す（RGB仮）
+  setAllColor(armLeft.Color(0, 155, 255, 0)); 
+  delay(427);
+  // 小松さんソロパート中
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  //setAllColor(armLeft.Color(255, 0, 0, 0)); // 赤（動作確認用：終了）
-  delay(3000);
+  delay(7014);
+
+  // 諭吉さんに光移す（RGB仮）
+  setAllColor(armLeft.Color(255, 0, 55, 0)); 
+  delay(517);
+  // 諭吉さんソロパート中
+  setAllColor(armLeft.Color(0, 0, 0, 0)); 
+  delay(6989);
+
+  // ドクターソロ
+  setAllColor(armLeft.Color(0, 0, 0, 255)); 
+  // 3秒くらい白
+  delay(2841);
+  rainbowCycleAll(5);
+
 
 }
 
