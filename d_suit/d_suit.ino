@@ -53,7 +53,7 @@ void setup() {
 void loop() {
 
   //03:19.340でスーツ点灯
-  setAllColor(armLeft.Color(0, 0, 255, 0)); // 緑（動作確認用：開始）
+  setAllColor(armLeft.Color(0, 0, 0, 5)); // 青（動作確認用：開始）
   delay(7477);
   setAllColor(armLeft.Color(0, 0, 0, 0));
 
@@ -66,11 +66,12 @@ void loop() {
   };
 
   lightPartsSequentially(order, 16, armLeft.Color(0, 0, 0, 255), 350, 100);
+  delay(100);
 
   // 3:34.830 3人で前に歩く：ゆっくりF.I.&F.O.で明滅（5回）
   // フェードイン点滅（点滅回数、変化の速さ、変化幅）←変化幅を大きくすると明滅が速くなるよ
   pulseWhiteAll(5, 1, 5);
-  delay(700);
+  delay(900);
 
   // 二人ハケる直前のｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝ！:前半ｼﾞｬﾝｼﾞｬﾝで左点灯右点灯、後半ｼﾞｬﾝｼﾞｬﾝ！で内から外、上から下
   // ｼﾞｬﾝ(左半身だけ点灯)
@@ -114,7 +115,7 @@ void loop() {
   delay(500);
   
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  delay(1550);
+  delay(1400);
 
   // サビ入りのテテテン！のとこ：テテテン！に合わせて全身に光が灯る
   lightAllPartsRandomSequence(armLeft.Color(0, 0, 0, 255), 250);
