@@ -152,8 +152,8 @@
 #define PULSE_WHITE_SPACE_DOCTOR     15     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
 #define PULSE_HOLD_WAIT_DOCTOR2      550     // 点灯待ち時間
-#define PULSE_HOLD_WAIT_DOCTOR_OFF   49200     // 点灯待ち時間 きらきら
-#define PULSE_WHITE_SPACE_DOCTOR_OFF     115     // 点滅間隔
+#define PULSE_HOLD_WAIT_DOCTOR_OFF   52700     // 点灯待ち時間 きらきら
+#define PULSE_WHITE_SPACE_DOCTOR_OFF     60     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR_OFF     1     // 点灯 カウント数
 #define WAVE_TIME_DOCTOR             1    // 点灯間隔　下から上の消灯
 #define WAVE_NUM_DOCTOR            3    // 点灯間隔
@@ -167,7 +167,7 @@
 #define YUKICHI_KOMATSU_APP_WAIT0  8200                       //消灯までも待ち時間
 #define YUKICHI_KOMATSU_APP_WAIT2  7700                       //水色点灯までも待ち時間
 #define YUKICHI_KOMATSU_APP_WAIT3  7400                       //水色消灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT4  7500                       //レインボーまでも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT4  9500                       //レインボーまでも待ち時間
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
