@@ -196,8 +196,8 @@
 #define PULSE_WHITE_SPACE_DOCTOR     15     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
 #define PULSE_HOLD_WAIT_DOCTOR2      500     // 点灯待ち時間
-#define PULSE_HOLD_WAIT_DOCTOR_OFF   49000     // 点灯待ち時間 きらきら
-#define PULSE_WHITE_SPACE_DOCTOR_OFF     115     // 点滅間隔
+#define PULSE_HOLD_WAIT_DOCTOR_OFF   52500     // 点灯待ち時間 きらきら 3700
+#define PULSE_WHITE_SPACE_DOCTOR_OFF     60     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR_OFF     1     // 点灯 カウント数
 #define WAVE_TIME_DOCTOR             1    // 点灯間隔　下から上の消灯
 #define WAVE_NUM_DOCTOR            3    // 点灯間隔
@@ -210,7 +210,7 @@
 #define YUKICHI_KOMATSU_APP_WAIT  0                       //白固定までも待ち時間
 #define YUKICHI_KOMATSU_APP_WAIT2 8200                       //ピンク点灯までも待ち時間
 #define YUKICHI_KOMATSU_APP_WAIT3 7500                       //ピンク消灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT4 15000                       //レインボーまでも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT4 17000                       //レインボーまでも待ち時間
 
 
 // ==================== グローバル変数 ====================
@@ -424,25 +424,13 @@ void performMainSequence() {
 }
 
 void performDebugSequence() {
-
-      //２曲目ドクター登場
-   //delay(PULSE_HOLD_WAIT_DOCTOR);
-   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
-   delay(PULSE_HOLD_WAIT_DOCTOR2);//無音のところ
-   pulseWhiteAll(PULSE_WHITE_TIME_DOCTOR, PULSE_WHITE_SPACE_DOCTOR, PULSE_WHITE_SPEED_DOCTOR); 
-   setAllColor(LED_WHITE_COLOR);     
+   setAllColor(LED_WHITE_COLOR);   
    pulseWhiteAll_off(1, PULSE_WHITE_SPACE_DOCTOR_OFF, PULSE_WHITE_SPEED_DOCTOR_OFF); 
-   delay(PULSE_HOLD_WAIT_DOCTOR_OFF);//48秒徐々にフェードアウト～次の登場まで
+  delay(PULSE_HOLD_WAIT_DOCTOR_OFF);//48秒徐々にフェードアウト～次の登場まで
   sparkleFullBody(YUKICHI_KOMATSU_APP_NUM, getWhiteColor(), YUKICHI_KOMATSU_APP_FLASH, YUKICHI_KOMATSU_APP_SPACE3);  // きらきら　全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
    delay(YUKICHI_KOMATSU_APP_WAIT);//7秒白固定待ち時間
-  setAllColor(LED_WHITE_COLOR); 
-   delay(YUKICHI_KOMATSU_APP_WAIT2);//7秒諭吉ピンク点灯待ち
-   setAllColor(LED_PART_PINK_COLOR);// 
-   delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
-   setAllColor(0);//
-   delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
-   rainbowCycleAll(10);
-
+   setAllColor(LED_WHITE_COLOR);   
+   
   delay(10000000);
 }
 
