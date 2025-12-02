@@ -53,9 +53,7 @@ void setup() {
 void loop() {
 
   //03:19.340でスーツ点灯
-  setAllColor(armLeft.Color(0, 0, 0, 5)); // 青（動作確認用：開始）
-  delay(7477);
-  setAllColor(armLeft.Color(0, 0, 0, 0));
+  delay(7500); //
 
   // ----- ドクターパート start -----
   // 3:26.817 幕開いて登場：1部位ずつ点灯
@@ -64,7 +62,6 @@ void loop() {
     &armRight, &legLeft, &bodyRight, &armLeft, &legRight, &bodyLeft,
     &armRight, &legLeft, &bodyRight, &armLeft,
   };
-
   lightPartsSequentially(order, 16, armLeft.Color(0, 0, 0, 255), 350, 100);
   delay(100);
 
@@ -76,19 +73,19 @@ void loop() {
   // 二人ハケる直前のｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝｼﾞｬﾝ！:前半ｼﾞｬﾝｼﾞｬﾝで左点灯右点灯、後半ｼﾞｬﾝｼﾞｬﾝ！で内から外、上から下
   // ｼﾞｬﾝ(左半身だけ点灯)
   setPartsColor(armLeft.Color(0, 0, 0, 255), LEFT_SIDE, 3);
-  delay(500);
+  delay(484);
   setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
   // ｼﾞｬﾝ（右半身だけ点灯）
   setPartsColor(armLeft.Color(0, 0, 0, 255), RIGHT_SIDE, 3);
-  delay(500);
+  delay(468);
   setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
   // ｼﾞｬﾝ（左半身だけ点灯）
   setPartsColor(armLeft.Color(0, 0, 0, 255), LEFT_SIDE, 3);
-  delay(500);
+  delay(481);
   setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
   // ｼﾞｬﾝ(右半身だけ点灯)
   setPartsColor(armLeft.Color(0, 0, 0, 255), RIGHT_SIDE, 3);
-  delay(500);
+  delay(479);
   setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
 
   // 3:41.953ちょっとスーツ暗転
@@ -121,35 +118,38 @@ void loop() {
   lightAllPartsRandomSequence(armLeft.Color(0, 0, 0, 255), 250);
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
   
-  // サビ？スウィングパート：全身白のままor8拍ずつで色変えたり何かしら変化させる？（ポイ振ってる時横向いてるし、３人の時色変えるかもだから白のままでもいい気もする）
+  // スウィングパート：全身白のまま
   delay(27500);
 
   // // スウィングパート終わりのジャンジャンジャンジャーン：ポイに合わせて半身ずつ白点灯、一瞬点灯してF.O.
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  delay(500);
+  delay(700);
   // ｼﾞｬﾝ(左半身だけ点灯)
   setPartsColor(armLeft.Color(0, 0, 0, 255), LEFT_SIDE, 3);
-  delay(450);
+  delay(433);
   setAllColor(armLeft.Color(0, 0, 0, 0)); // 消灯
   // ｼﾞｬﾝ（右半身だけ点灯）
   setPartsColor(armLeft.Color(0, 0, 0, 255), RIGHT_SIDE, 3);
-  delay(450);
+  delay(500);
   // ｼﾞｬﾝ（全身白）
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  delay(450);
+  delay(200);
+  // 一瞬消灯
+  setAllColor(armLeft.Color(0, 0, 0, 0));
+  delay(250);
   // ジャーン（キラキラ）
   sparkleFullBody(50, armLeft.Color(0, 0, 0, 255), 35, 40);  // 全身から<第一引数>個ランダムに選んで光らせる、を<第三引数>回やる）
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
-  delay(1000);
+  delay(800);
    
   // ----- ドクターパート end -----
 
   // ----- 3人パート start -----
   fadeInBrightness(5, 1);
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  delay(3100);
+  delay(3300);
 
-  // 後ろ指差す&Yk登場時のテテテン！に合わせて下から部位ごと消灯
+  // YK登場時のテテテン！に合わせて下から部位ごと消灯
   // 両足
   turnOffPair(&legLeft, &legRight);
   delay(200);
@@ -166,26 +166,27 @@ void loop() {
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
   delay(3834);
 
-  // 小松さんに光移す（RGB仮）
-  setAllColor(armLeft.Color(0, 155, 255, 0)); 
+  // 諭吉さんに光移す
+  setAllColor(armLeft.Color(255, 0, 55, 0)); 
   delay(427);
-  // 小松さんソロパート中
+  // 諭吉さんソロパート中
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(7014);
 
-  // 諭吉さんに光移す（RGB仮）
-  setAllColor(armLeft.Color(255, 0, 55, 0)); 
+  // 小松さんに光移す
+  setAllColor(armLeft.Color(0, 155, 255, 0)); 
   delay(517);
-  // 諭吉さんソロパート中
+  // 小松さんソロパート中
   setAllColor(armLeft.Color(0, 0, 0, 0)); 
   delay(6989);
 
   // ドクターソロ
   setAllColor(armLeft.Color(0, 0, 0, 255)); 
-  // 3秒くらい白
-  delay(2841);
-  rainbowCycleAll(5);
 
+
+  // レインボー
+  delay(2841); // ゆきちさん調整お願いします！！
+  rainbowCycleAll(5);
 
 }
 
