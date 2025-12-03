@@ -110,7 +110,7 @@
 #define DISK_MOVE_SPACE3 40                        // 点灯間隔
 
 //全身ピンク
-#define DISK_MOVE_PINK_WAIT 31250//ピンクディスクの移動
+#define DISK_MOVE_PINK_WAIT 31000//ピンクディスクの移動
 
 //小松マルチカラーパート
 #define DISK_MOVE_BLUE_WAIT 2000//緑点灯待ち
@@ -121,7 +121,7 @@
 
 
 // 8. パチ屋
-#define DARK_DANCE_WAIT    4600  // 開始待ち時間
+#define DARK_DANCE_WAIT    4500  // 開始待ち時間
 #define DARK_DANCE_SPEED   20    // 点灯速度
 #define DARK_DANCE_TIME    37    // 繰り返し回数
 
@@ -134,7 +134,7 @@
 // #define DARK_DANCE_WAIT3     4000  // 開始待ち時間
 
 //カイリキーラストカラー
-#define KAIRIKI_COLOR_WAIT     19000  // 開始待ち時間 点灯
+#define KAIRIKI_COLOR_WAIT     18900  // 開始待ち時間 点灯
 #define KAIRIKI_COLOR_WAIT2     4250  // 開始待ち時間 消灯
 
 //カラーパート
@@ -152,7 +152,7 @@
 #define PULSE_WHITE_SPACE_DOCTOR     15     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR     3     // 点灯 カウント数
 #define PULSE_HOLD_WAIT_DOCTOR2      550     // 点灯待ち時間
-#define PULSE_HOLD_WAIT_DOCTOR_OFF   52700     // 点灯待ち時間 きらきら
+#define PULSE_HOLD_WAIT_DOCTOR_OFF   52500     // 点灯待ち時間 きらきら
 #define PULSE_WHITE_SPACE_DOCTOR_OFF     60     // 点滅間隔
 #define PULSE_WHITE_SPEED_DOCTOR_OFF     1     // 点灯 カウント数
 #define WAVE_TIME_DOCTOR             1    // 点灯間隔　下から上の消灯
@@ -165,9 +165,10 @@
 #define YUKICHI_KOMATSU_APP_SPACE3 40                        // 点灯間隔
 #define YUKICHI_KOMATSU_APP_WAIT  0                       //白固定までも待ち時間
 #define YUKICHI_KOMATSU_APP_WAIT0  8200                       //消灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT2  7700                       //水色点灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT3  7400                       //水色消灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT4  9500                       //レインボーまでも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT2  8200                       //水色点灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT3  6900                       //水色消灯までも待ち時間
+#define RANDOM_ALL_WAIT3 1900 //この葉前のランダム点灯
+#define YUKICHI_KOMATSU_APP_WAIT4  5550                       //レインボーまでも待ち時間
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -355,6 +356,8 @@ void performMainSequence() {
    delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
    setAllColor(0);//
    delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
+   random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+   delay(RANDOM_ALL_WAIT3);
    rainbowCycleAll(10);
 
 
@@ -382,6 +385,8 @@ void performDebugSequence() {
    delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
    setAllColor(0);//
    delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
+   random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+   delay(RANDOM_ALL_WAIT3);
    rainbowCycleAll(10);
 
 
