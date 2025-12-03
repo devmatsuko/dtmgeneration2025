@@ -208,10 +208,10 @@
 #define YUKICHI_KOMATSU_APP_FLASH 129                        // 光
 #define YUKICHI_KOMATSU_APP_SPACE3 40                        // 点灯間隔
 #define YUKICHI_KOMATSU_APP_WAIT  0                       //白固定までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT2 8200                       //ピンク点灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT3 7500                       //ピンク消灯までも待ち時間
-#define YUKICHI_KOMATSU_APP_WAIT4 17000                       //レインボーまでも待ち時間
-
+#define YUKICHI_KOMATSU_APP_WAIT2 8600                       //ピンク点灯までも待ち時間
+#define YUKICHI_KOMATSU_APP_WAIT3 7100                       //ピンク消灯までも待ち時間
+#define RANDOM_ALL_WAIT3 2000 //この葉前のランダム点灯
+#define YUKICHI_KOMATSU_APP_WAIT4 13000                       //レインボーまでも待ち時間
 
 // ==================== グローバル変数 ====================
 // LEDストリップオブジェクト
@@ -402,7 +402,12 @@ void performMainSequence() {
    setAllColor(LED_PART_PINK_COLOR);// 
    delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
    setAllColor(0);//
+
+   
+
    delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
+   random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+   delay(RANDOM_ALL_WAIT3);
    rainbowCycleAll(10);
   // //アピール全身白
   //  delay(LED_WHITE_WAIT);
