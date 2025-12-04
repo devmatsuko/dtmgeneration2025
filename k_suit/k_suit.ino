@@ -58,7 +58,7 @@
 #define WHITE_ON_WAIT 16000  // 点灯時間　上から下　ロックマン待ち時間
 
 // 消灯
-#define WHITE_OFF_WAIT 6200  // 消灯時間
+#define WHITE_OFF_WAIT 6100  // 消灯時間
 
 // 衣装切り替え
 #define SUITS_CHANGE_WAIT     2300   // 開始待ち時間 この数字はいじっちゃだめ
@@ -110,7 +110,7 @@
 #define DISK_MOVE_SPACE3 40                        // 点灯間隔
 
 //全身ピンク
-#define DISK_MOVE_PINK_WAIT 31000//ピンクディスクの移動
+#define DISK_MOVE_PINK_WAIT 31100//ピンクディスクの移動
 
 //小松マルチカラーパート
 #define DISK_MOVE_BLUE_WAIT 2000//緑点灯待ち
@@ -356,7 +356,7 @@ void performMainSequence() {
    delay(YUKICHI_KOMATSU_APP_WAIT3);//7諭吉ピンク消灯待ち
    setAllColor(0);//
    delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
-   random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+   random_all(LED_PART_BLUE_COLOR, RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
    delay(RANDOM_ALL_WAIT3);
    rainbowCycleAll(10);
 
