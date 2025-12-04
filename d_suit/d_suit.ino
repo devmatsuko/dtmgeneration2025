@@ -185,9 +185,9 @@ void loop() {
 
 
   // レインボー
-  delay(9000); // ゆきちさん調整お願いします！！
-  rainbowCycleAll(5);
-
+  delay(9200); // ゆきちさん調整お願いします！！
+  rainbowCycleAll(10);
+  delay(10000000); //無限ループ防止
 }
 
 /**
