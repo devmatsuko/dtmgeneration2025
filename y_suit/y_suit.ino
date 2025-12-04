@@ -406,7 +406,7 @@ void performMainSequence() {
    
 
    delay(YUKICHI_KOMATSU_APP_WAIT4);//15諭吉レインボー待ち
-   random_all(getWhiteColor(), RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
+   random_all(LED_PART_PINK_COLOR, RANDOM_ALL_TIME, RANDOM_ALL_SPACE, RANDOM_ALL_NUM);
    delay(RANDOM_ALL_WAIT3);
    rainbowCycleAll(10);
   // //アピール全身白
